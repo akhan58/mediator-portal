@@ -1,0 +1,23 @@
+[33mcommit 61fc14c28d37be308e34c474d89e08bd7ac5f9e7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Ali Khan <ali.khan@fdmgroup.com>
+Date:   Thu Feb 13 16:35:29 2025 -0600
+
+    Re-added mediator-portal as a normal directory
+
+[33mcommit 3b9d63a4be00c88b2b9406c5be4fda8c51db9903[m
+Author: Ali Khan <ali.khan@fdmgroup.com>
+Date:   Thu Feb 13 16:21:33 2025 -0600
+
+    Re-added mediator-portal as a normal directory
+
+[33mcommit e3899b888599696035e94fa9c2c74c0bc8a81759[m
+Author: Ali Khan <ali.khan@fdmgroup.com>
+Date:   Thu Feb 13 16:20:39 2025 -0600
+
+    Removed mediator-portal submodule
+
+[33mcommit 2934a2ad4eb3f1b343c7073d574b5cd8b765c52b[m
+Author: Ali Khan <ali.khan@fdmgroup.com>
+Date:   Tue Feb 4 15:40:03 2025 -0600
+
+    Initial commit
