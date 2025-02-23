@@ -1,3 +1,9 @@
+// passport.js (Back End - Authentication Configuration)
+// Handles user authentication using Google OAuth 2.0 and Facebook OAuth, maybe others later on
+// It sets up the strategies with client IDs, secrets, and callback URLs sourced from environment variables,
+// and defines how user sessions are serialized and deserialized. This is backend code responsible for
+// integrating third-party authentication into the application.
+
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
