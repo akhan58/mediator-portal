@@ -1,3 +1,9 @@
+// App.js (Front End - React Component)
+// This is the main piece for the Mediator Portal front end.
+// It sets up client-side routing, defining routes for home,
+// login, signup, review dashboard, and review request form.
+// It also includes a Navbar component for navigation and applies styles from App.css.
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';

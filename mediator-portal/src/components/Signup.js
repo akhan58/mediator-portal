@@ -1,3 +1,9 @@
+// Signup.js (Front End - React Component)
+// This component renders a signup form for new users.
+// It collects a username and password and sends a POST request to the backend
+// endpoint (http://localhost:5000/auth/signup) to create a new account.
+// An alert tells user whether the signup was successful or failed.
+
 import React, { useState } from 'react';
 import axios from 'axios';
 

@@ -1,3 +1,8 @@
+// ReviewDashboard.js (Front End - React Component)
+// This component retrieves and displays reviews for a specific business.
+// It uses the businessId prop to fetch review data
+// and then makes a table displaying each review's platform, rating, date, and text.
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 

@@ -1,3 +1,10 @@
+// OutreachDashboard.js (Front End - React Component)
+// This part fetches reviews for a given business (using its businessId) from the backend,
+// filters the reviews to include only those with a rating of 2 or lower,
+// and displays them in a table with details such as platform, rating, date, and review text.
+// Each review row includes a "Flag for Outreach" button that, when clicked,
+// sends a POST request to flag the review for outreach, then displays the response message.
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
