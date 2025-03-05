@@ -1,0 +1,41 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+require('dotenv').config();
+
+// First Yelp Review request iteration
+const fetchYelpReviews = (businessId) => {
+    const [reviews, setReviews] = useState([]);
+    const [error, setError] = useState(null);
+  
+    const yelpApiKey = process.env.YELP_API_KEY;
+  
+    useEffect(() => {
+      const fetchReviews = async () => {
+        try {
+          const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`,
+            {
+              headers: {
+                Authorization: `Bearer ${yelpApiKey}`,
+              },
+            }
+          );
+  
+          if (response.data.reviews) {
+            setReviews(response.data.reviews);
+          } else {
+            setError("No reviews found.");
+          }
+        } catch (err) {
+          setError("Failed to fetch reviews.");
+          console.error(err);
+        }
+      };
+  
+      fetchReviews();
+    }, [yelpApiKey, businessId]);
+  
+    return { reviews, error };
+  };
+  
+  export default fetchYelpReviews;
