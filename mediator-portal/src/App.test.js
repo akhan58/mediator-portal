@@ -1,3 +1,9 @@
+// App.test.js (Front End - Test Suite)
+// This file contains tests for the App component
+// It verifies that key UI elements are rendered correctly, including the welcome message,
+// login link, and signup link. The App component is wrapped with a Router to support routing.
+
+
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom'; // Import Router for routing
 import App from './App';

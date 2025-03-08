@@ -1,3 +1,9 @@
+// ReviewRequestForm.js (Front End - React Component)
+// This component makes a form that allows a business to send a review request.
+// The form collects a contact (email or phone number), selects a platform (e.g., Google or Yelp),
+// and chooses the delivery method (email or SMS). On submission, it posts the data to the
+// backend and displays a response message.
+
 import React, { useState } from 'react';
 import axios from 'axios';
 

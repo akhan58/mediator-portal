@@ -1,3 +1,10 @@
+// authController.js (Back End - Authentication Controller)
+// This part handles user authentication. It exports two functions:
+// - signup: Validates input, checks if the user already exists, hashes the password using bcrypt,
+//   and adds the new user to an in-memory store.
+// - login: Validates user credentials and, if correct, generates a JWT token valid for 1 hour.
+// So in a nutshell this controller is used on the backend to manage user signup and login processes.
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const users = require('../models/user');  // For now using a mock in-memory store

@@ -1,3 +1,8 @@
+// AdminDashboard.js (Front End - React Component)
+// This part is supposed to fetch review data and displays it in a table.
+// It shows platform, rating, date, review text,
+// and flags for dispute and outreach status, providing an overview for the review ppl.
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 

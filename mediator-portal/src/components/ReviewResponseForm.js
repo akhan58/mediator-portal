@@ -1,3 +1,9 @@
+// ReviewResponseForm.js (Front End - React Component)
+// This part makes a form that allows a user to submit a response to a specific review.
+// It takes a reviewId as a prop and provides a text area where user can put their response.
+// When the form is submitted, it sends a POST request
+// with the reviewId and the response text, and displays a success or error message.
+
 import React, { useState } from 'react';
 import axios from 'axios';
 

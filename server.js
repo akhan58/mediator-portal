@@ -1,3 +1,9 @@
+// server.js (Back End - Express Server Entry Point)
+// This is where it all sets up and starts the Express server. It loads environment variables,
+// initializes Passport for authentication, and parses JSON data.
+// It then mounts the authentication routes (/auth), review-related routes (/api/reviews),
+// and review request generation routes (/api/reviewGeneration). Finally, it listens on the specified port.
+
 const express = require('express');
 const passport = require('passport');
 const dotenv = require('dotenv');

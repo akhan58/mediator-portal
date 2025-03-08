@@ -1,3 +1,9 @@
+// DisputeForm.js (Front End - React Component)
+// This part makes a form to allow users to flag a review for dispute.
+// It takes a reviewId as a prop and lets the user input a reason for the dispute.
+// When submission happens, it sends a POST request with the reviewId and reason.
+// The response message is then displayed, showing the result of this whole thing.
+
 import React, { useState } from 'react';
 import axios from 'axios';
 

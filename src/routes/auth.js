@@ -1,3 +1,10 @@
+// auth.js (Back End - Express Router for Authentication)
+// This part is for the authentication routes for the application. It handles user
+// registration (signup) and login by validating inputs, checking existing users,
+// hashing passwords, and generating JWT tokens. It also includes OAuth authentication
+// routes using Passport.js for Google and Facebook, basically where successful authentication
+// results in a JWT token generation and takes you back to the dashboard.
+
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');

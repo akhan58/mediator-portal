@@ -1,3 +1,10 @@
+// reviewGeneration.js (Back End - Express Route)
+// This sets up an Express router that handles review request generation.
+// It provides a POST endpoint (/sendRequest) which accepts a contact (email or phone),
+// a platform, and a method (either "email" or "sms").
+// Based on the method, it sends a review request using either nodemailer (for email)
+// or Twilio (for SMS), and returns a success message or an error response.
+
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
