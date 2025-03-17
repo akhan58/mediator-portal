@@ -32,3 +32,11 @@ app.use('/api/reviewGeneration', reviewGenRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Connect external review routes
+const reviewExternalRoutes = require('./src/routes/externalReviews');
+app.use('/api/external-reviews', reviewExternalRoutes);
+
+// Connect mock review route
+const reviewMockRoutes = require('./src/routes/mockReviews');
+app.use('/api/external-reviews', reviewMockRoutes);
