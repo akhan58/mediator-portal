@@ -10,6 +10,10 @@ router.get('/google/:placeId', async (req, res) => {
     try {
         const {reviews, error} = await fetchGoogleReviews(req.params.placeId);
 
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
         const storedReviews= [];
 
         for (const review of reviews) {
@@ -27,6 +31,10 @@ router.get('/google/:placeId', async (req, res) => {
 router.get('/trustpilot/:businessUnitId', async (req, res) => {
     try {
         const {reviews, error} = await fetchTrustpilotReviews(req.params.businessUnitId);
+
+        if (error) {
+            return res.status(400).json({ error });
+        }
 
         const storedReviews= [];
 
@@ -46,6 +54,10 @@ router.get('/yelp/:businessId', async (req, res) => {
     try {
         const {reviews, error} = await fetchYelpReviews(req.params.businessId);
 
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
         const storedReviews= [];
 
         for (const review of reviews) {
@@ -63,6 +75,10 @@ router.get('/yelp/:businessId', async (req, res) => {
 router.get('/facebook/:pageId', async (req, res) => {
     try {
         const {reviews, error} = await fetchFacebookReviews(req.params.pageId);
+
+        if (error) {
+            return res.status(400).json({ error });
+        }
 
         const storedReviews= [];
 

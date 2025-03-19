@@ -1,3 +1,41 @@
+const axios = require('axios');
+require('dotenv').config();
+
+const fetchTrustpilotReviews = async (businessUnitId) => {
+    const trustpilotApiKey = process.env.TRUSTPILOT_API_KEY;
+
+    try {
+        const response = await axios.get(
+            `https://api.trustpilot.com/v1/business-units/${businessUnitId}/reviews`,
+            {
+                headers: {
+                    Authorization: `Bearer ${trustpilotApiKey}`,
+                },
+            }
+        );
+        console.log("Trustpilot API Response:", response.data);
+
+        if (response.data.reviews) {
+            const transformedReviews = response.data.reviews.map(review => ({
+                platform: 'Trustpilot',
+                rating: parseInt(review.rating || review.stars) || 0,
+                content: review.text || '',
+                timestamp: new Date(review.createdAt)
+            }));
+            
+            return { reviews: transformedReviews, error: null};
+        } else {
+            return { reviews: [], error: "No reviews found." };
+        }
+    } catch (err) {
+        console.error("Trustpilot API fetching error.", err);
+        return { reviews: [], error: "Failed to fetch reviews." };
+    }
+}
+
+module.exports = { fetchTrustpilotReviews };
+
+/* OLD CODE
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -39,3 +77,4 @@ const fetchTrustpilotReviews = (businessUnitId) => {
   };
   
   export default fetchTrustpilotReviews;
+  */
