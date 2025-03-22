@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const dataAccessLayer = require('../models/dataAccessLayer');
-const { fetchGoogleReviews } = require('../routes/googleReviews');
-const { fetchTrustpilotReviews } = require('../routes/trustpilotReviews');
-const { fetchYelpReviews } = require ('../routes/yelpReviews');
-const { fetchFacebookReviews } = require('../routes/facebookReviews');
+const reviewsAccessLayer = require('../models/reviewsAccessLayer');
+const { fetchGoogleReviews } = require('./googleReviews');
+const { fetchTrustpilotReviews } = require('./trustpilotReviews');
+const { fetchYelpReviews } = require ('./yelpReviews');
+const { fetchFacebookReviews } = require('./facebookReviews');
 
 router.get('/google/:placeId', async (req, res) => {
     try {
@@ -17,7 +17,7 @@ router.get('/google/:placeId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await dataAccessLayer.createReview(review);
+            const storedReview = await reviewsAccessLayer.createReview(review);
             storedReviews.push(storedReview);
         }
 
@@ -39,7 +39,7 @@ router.get('/trustpilot/:businessUnitId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await dataAccessLayer.createReview(review);
+            const storedReview = await reviewsAccessLayer.createReview(review);
             storedReviews.push(storedReview);
         }
 
@@ -61,7 +61,7 @@ router.get('/yelp/:businessId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await dataAccessLayer.createReview(review);
+            const storedReview = await reviewsAccessLayer.createReview(review);
             storedReviews.push(storedReview);
         }
 
@@ -83,7 +83,7 @@ router.get('/facebook/:pageId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await dataAccessLayer.createReview(review);
+            const storedReview = await reviewsAccessLayer.createReview(review);
             storedReviews.push(storedReview);
         }
 
@@ -96,7 +96,7 @@ router.get('/facebook/:pageId', async (req, res) => {
 
 router.get('/all', async (req, res) => {
     try {
-        const allReviews = await dataAccessLayer.getAllReview();
+        const allReviews = await reviewsAccessLayer.getAllReview();
         res.status(200).json(allReviews);
     } catch (err) {
         console.error(err);
