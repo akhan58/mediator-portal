@@ -2,8 +2,6 @@ import openai, chromadb, tiktoken, json, os
 
 from flask import Flask, request, jsonify
 
-
-
 # Model API
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -29,23 +27,24 @@ def get_embedding(text):
     return response.data[0].embedding
 
 
-def load_policies():
-    with open("./policies/policies.json", 'r') as f:
+def load_policies(platform=""):
+    path = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{path}/policies/policies.json", 'r') as f:
         website_policies = f.read()
     f.close()
 
     website_policies = json.loads(website_policies)
 
     
-
     for website, policies in website_policies.items():
-        for idx, policy in enumerate(policies):
-            embedding = get_embedding(policy)
-            collections[website].add(
-                ids=[f"{website}_{idx}"],
-                embeddings=[embedding],
-                documents=[policy]
-            )
+        if website.lower() == platform.lower() or platform.strip() == "":
+            for idx, policy in enumerate(policies):
+                embedding = get_embedding(policy)
+                collections[website].add(
+                    ids=[f"{website}_{idx}"],
+                    embeddings=[embedding],
+                    documents=[policy]
+                )
 
 def find_relevant_policies_chroma(review, website, top_k=3, min_score=0.75):
     review_embedding = get_embedding(review)
@@ -79,7 +78,7 @@ def analyze_review(review, platform):
     prompt = (
         f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {platform} review policies:"
         f"Suspected violated policy categories: {relevant_policies}"
-        'Follow the exact json format for your answer: ["violated_policy_category_1", ..., ], "policy_violation_reason": "Provide a reason or a concrete policy that was violated by the review, keep empty if it did not violate any of the rules"'
+        'You must always follow the exact json array format for your answer:  [ { "violated_policy_category" : "violated_policy_category_1", "policy_violation_reason": "Provide a concrete reason why this policy was violated by the review"}, ...] '
     )
 
     #print(f"Tokens Used: {count_tokens(prompt)}")
@@ -91,6 +90,8 @@ def analyze_review(review, platform):
                   {"role": "user", "content": prompt}]
     )
 
+    #print(f"Model reply: \n {response.choices[0].message.content}")
+
     json_result = json.loads(response.choices[0].message.content)
 
     return json_result
@@ -99,6 +100,8 @@ def analyze_review(review, platform):
 
 app = Flask("GPT_Analysis")
 
+
+# Endpoint to analyze review to see if it violates given platform policies
 @app.route('/analyze-review', methods=['POST'])
 def analyze_review_call():
     data = request.json
@@ -107,11 +110,17 @@ def analyze_review_call():
 
     return jsonify(analyze_review(review, platform))
 
+# Endpoint to generate chroma-db with policy embeddings
+@app.route('/generate-embeddings', methods=['POST'])
+def generate_embeddings_call():
+    data = request.json
+    platform = data.get("platform", "")
+    load_policies(platform)
+    return jsonify({})
+
 
 
 def main():
-    #load_policies()
-    #print(analyze_review("This product is okay I guess, although it did break after 2 months", "google"))
     app.run(debug=True, port=3500)
 
 
