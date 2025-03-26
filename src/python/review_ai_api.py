@@ -1,11 +1,15 @@
-import openai, chromadb, tiktoken, numpy as np, json, os
+import openai, chromadb, tiktoken, json, os
+
+from flask import Flask, request, jsonify
+
+
+
+# Model API
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if OPENAI_API_KEY == None or OPENAI_API_KEY.strip() == "":
     raise Exception("ERROR: OPENAI_API_KEY Environment variable is not set.")
-
-
 
 openai.api_key = OPENAI_API_KEY
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
@@ -70,29 +74,46 @@ def count_tokens(text, model="gpt-4o-mini"):
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
-def analyze_review(review, website):
-    relevant_policies = find_relevant_policies_chroma(review, website)
+def analyze_review(review, platform):
+    relevant_policies = find_relevant_policies_chroma(review, platform)
     prompt = (
-        f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {website} review policies:"
+        f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {platform} review policies:"
         f"Suspected violated policy categories: {relevant_policies}"
         'Follow the exact json format for your answer: ["violated_policy_category_1", ..., ], "policy_violation_reason": "Provide a reason or a concrete policy that was violated by the review, keep empty if it did not violate any of the rules"'
     )
 
-    print(f"Tokens Used: {count_tokens(prompt)}")
+    #print(f"Tokens Used: {count_tokens(prompt)}")
 
 
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{ "role": "system", "content": f"You're a {website} moderation assistant. Your goal is to evaluate provided user reviews based on the provided website review policies."},
+        messages=[{ "role": "system", "content": f"You're a {platform} moderation assistant. Your goal is to evaluate provided user reviews based on the provided website review policies."},
                   {"role": "user", "content": prompt}]
     )
 
-    return response.choices[0].message.content
+    json_result = json.loads(response.choices[0].message.content)
+
+    return json_result
+
+# Flask Connection
+
+app = Flask("GPT_Analysis")
+
+@app.route('/analyze-review', methods=['POST'])
+def analyze_review_call():
+    data = request.json
+    review = data.get("review")
+    platform = data.get("platform")
+
+    return jsonify(analyze_review(review, platform))
+
+
 
 def main():
     #load_policies()
-    print(analyze_review("This product is okay I guess, although it did break after 2 months", "google"))
-    
+    #print(analyze_review("This product is okay I guess, although it did break after 2 months", "google"))
+    app.run(debug=True, port=3500)
+
 
 
 if __name__ == "__main__":
