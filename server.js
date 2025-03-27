@@ -28,8 +28,8 @@ const reviewRoutes = require('./src/routes/reviews');
 app.use('/api/reviews', reviewRoutes);
 
 // Conntect the dispute routes
-const disputeRoutes = require('./src/routes/disputes');
-app.use('/api/disputes', disputeRoutes);
+//const disputeRoutes = require('./src/routes/disputes');
+//app.use('/api/disputes', disputeRoutes);
 
 const reviewGenRoutes = require('./src/routes/reviewGeneration');
 app.use('/api/reviewGeneration', reviewGenRoutes);
