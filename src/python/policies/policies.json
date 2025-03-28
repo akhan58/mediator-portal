@@ -49,7 +49,7 @@
         "Restricted content: For some products or services subject to controls and local regulations, you must follow certain guidelines when posting content. The content you upload may not feature calls to action or offers for the sale of products or services that are subject to local legal regulations. This includes, but is not limited to, alcohol, gambling, tobacco, guns, health and medical devices, regulated pharmaceuticals, adult services, and financial services.",
         "Restricted content: Links to a landing page where it is possible to purchase restricted goods or services.",
         "Restricted content: Email address and/or phone numbers to contact for the purchase of restricted goods.",
-        "Restricted content: Promotional offers for restricted goods or services. For example, you shouldn’t upload content that displays deals, coupons, pricing information or other promotions for a restricted product or service.",
+        "Restricted content: Promotional offers for restricted goods or services. For example, you should not upload content that displays deals, coupons, pricing information or other promotions for a restricted product or service.",
         "Dangerous content: Content that facilitates or encourages serious physical harm to health, safety, property, animals, or the environment.",
         "Dangerous content: Content that promotes dangerous activities that could result in serious physical harm to the person committing the act, those around them, or animals.",
         "Dangerous content: Content encouraging minors to participate in dangerous activities or use dangerous items.",
@@ -69,22 +69,44 @@
         "Terrorist content: Content that incites violence, promotes terrorist acts or celebrates terrorist attacks.",
         "Terrorist content: Content produced by or on behalf of terrorist groups.",
         "Terrorist content: We may allow content related to terrorism for an educational, documentary, scientific, or artistic purpose if sufficient information is provided for users to understand the context.",
-        "Off-topic: We don’t allow content which contains general, political, or social commentary or personal rants.",
+        "Off-topic: We do not allow content which contains general, political, or social commentary or personal rants.",
         "Advertising & solicitation: Promotional or commercial content",
         "Advertising & solicitation: Posting email addresses, phone numbers, social media links, or links to other websites in your reviews",
         "Unclear content: Posting content that lacks meaning across languages, such as a random group of characters.",
         "Repetitive content: Posting the same content multiple times either from the same account or multiple accounts",
-        "Defacement & Mischief: We don’t allow content that aims to destroy or damage the digital presence of a feature. This includes editing information about a place to make it inappropriate or low quality, as a prank or to express your social or political views."
+        "Defacement & Mischief: We do not allow content that aims to destroy or damage the digital presence of a feature. This includes editing information about a place to make it inappropriate or low quality, as a prank or to express your social or political views."
     ],
     "meta": [
-        "Harm against people: Exposing the identity or locations affiliated with anyone who is alleged to: Be a member of an outing-risk group; and/or Share familial and/or romantic relationships with a member(s) of an outing-risk group; and/or Have performed professional activities in support of an outing-risk group (except for political figures)",
-        "Harm against people: Outing the undercover status of law enforcement, military, or security personnel if the content contains the agent’s name, their face or badge and any of the following: The agent’s law enforcement organization, The agent’s law enforcement operation, Explicit mentions of their undercover status",
-        "Harm against people: Coordinating, threatening, supporting, or admitting to swatting except in the context of awareness raising or condemnation, fictional or staged settings or redemption.",
-        "Harm against people: Depicting, promoting, advocating for or encouraging participation in a high-risk viral challenge except in the context of awareness raising or condemnation. Where imagery is depicted in these contexts, we include a label so that people are aware that the content may be sensitive.",
-        "Harm against animals: Coordinating, threatening, supporting or admitting to acts of physical harm against animals (in written, visual or verbal form) except in cases of: Awareness-raising or condemnation; Redemption; Survival or defense of self, another human or another animal; Fictional or staged settings EXCEPT where it depicts staged animal fights or fake animal rescues; Hunting or fishing; Religious sacrifice; Food preparation or processing; Pests or vermin; Mercy killing; Bullfighting",
-        "Harm against animals: Coordinating, threatening, supporting, depicting or admitting to staged animal fights or depicting video imagery of fake animal rescues except in the context of awareness raising or condemnation or redemption."
+        "Manipulation: Community Feedback must not be used to misrepresent, deceive, defraud or exploit others for a financial or personal benefit.",
+        "Incentivization: Community Feedback must not be directly or indirectly incentivized, unless otherwise disclosed compliant with Meta’s policies on Branded Content.",
+        "Irrelevance: Community Feedback must be based on a reviewer's direct experience with a product, business, or seller. ",
+        "Irrelevance: The feedback must be related to the intended use of the product and/or business.",
+        "Graphic or Inappropriate Content: Community Feedback must not include any content or media that is excessively graphic, inflammatory, violent, discriminatory, or threatening to any person or group.",
+        "Spam: Community Feedback must comply with Meta’s policies on Spam. Including, but not limited to engagement bating, high frequency content posting, sharing, or promoting is not allowed."
     ],
     "yelp": [
-
+        "Relevance: Contributions must be appropriate to the forum.",
+        "Inappropriate content: Colorful language is allowed, yet threats, harassment, lewdness, hate speech, or other displays of bigotry are strongly prohibited.",
+        "Conflicts of interest: Contributions to Yelp must be unbiased and objective, avoiding all personal connections in the industry, business, or networking group.",
+        "Privacy: Publication of people's private information is strongly prohibited.",
+        "Privacy: Posting close-up photos or videos of other patrons without their permission is strongly prohibited.",
+        "Privacy: Posting other people's full names, unless referring to someone who is commonly referred to by their full name, is strongly prohibited.",
+        "Promotional content: Posting promotional material, unless it's in connection with a Yelp advertising product and through a Business Account, is strongly prohibited.",
+        "Posted content: Copying content from other sites, users, or businesses is strongly prohibited.",
+        "Posted content: The use of chatbots or other AI tools to create reviews, including using such tools to draft or revise, is strongly discouraged."
+    ],
+    "trustpilot": [
+        "General Rules: You cannot write a review about someone else's experience",
+        "General Rules: You cannot write a review about an experience that happened more than 12 months ago",
+        "General Rules: Don't post anything harmful, hateful, discriminatory, defamatory, or obscene",
+        "General Rules: Don't lie, bully, blackmail, make threats or do anything illegal",
+        "Incentive: You cannot write a review if you've been offered an incentive, such as discounts, monetary rewards, or loyalty points, in exchange for writing a review. Businesses are not allowed to provide incentives for reviews.",
+        "Special relationship: You cannot write a review about a business or their products if you or someone in your immediate family owns or works for the business.",
+        "Special relationship: You cannot write a review if the business is a direct competitor to a business you own or work for.",
+        "Special relationship: You cannot write a review about your employment-related experiences with the business, such as job interviews, the business's politics, or their employment practices.",
+        "Special relationship: ALLOWED - If you're a former employee, you can write a review about a genuine buying or service experience you had with the business when you weren't employed there.",
+        "Trending: You cannot write a review about a topic that's currently trending in the news or social media. Trustpilot is not a platform for discussing political, religious, or social views; please keep the content of your review based on your personal buying or service experience with the business.",
+        "Promotion: Keep reviews relevant - do not include any promotional references, marketing material or links.",
+        "Privacy: Including someone else's sensitive or personal information, such as names, phone numbers, addresses, email addresses, anything that could be used to track identify, contact or impersonate someone is strictly prohibited."
     ]
 }

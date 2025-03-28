@@ -27,7 +27,7 @@ app.use('/auth', require('./src/routes/auth'));
 const reviewRoutes = require('./src/routes/reviews');
 app.use('/api/reviews', reviewRoutes);
 
-// Conntect the dispute routes
+// Connect the dispute routes (temporarily commented until disputes.js is finished)
 //const disputeRoutes = require('./src/routes/disputes');
 //app.use('/api/disputes', disputeRoutes);
 
@@ -40,9 +40,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Connect external review routes
 const getReviewsRoutes = require('./src/routes/getReviews');
 app.use('/api/get-reviews', getReviewsRoutes);
-
-
-
 
 // Connect mock review route
 const reviewMockRoutes = require('./src/routes/mockReviews');

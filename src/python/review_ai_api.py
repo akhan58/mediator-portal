@@ -15,18 +15,17 @@ chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collections = {
         "google": chroma_client.get_or_create_collection(name="google_policy_embeddings"),
         "meta": chroma_client.get_or_create_collection(name="meta_policy_embeddings"),
-        "yelp": chroma_client.get_or_create_collection(name="yelp_policy_embeddings")
+        "yelp": chroma_client.get_or_create_collection(name="yelp_policy_embeddings"),
+        "trustpilot": chroma_client.get_or_create_collection(name="trustpilot_policy_embeddings")
     }
 
-
+# Generates an embedding for given text
 def get_embedding(text):
     response = openai.embeddings.create(model="text-embedding-3-large", input=text)
-    
-    #print(response)
 
     return response.data[0].embedding
 
-
+# Loads policies from given platform
 def load_policies(platform=""):
     path = os.path.dirname(os.path.abspath(__file__))
     with open(f"{path}/policies/policies.json", 'r') as f:
@@ -46,7 +45,8 @@ def load_policies(platform=""):
                     documents=[policy]
                 )
 
-def find_relevant_policies_chroma(review, website, top_k=3, min_score=0.75):
+# Embeds the review and finds top_k closest policy violations
+def find_relevant_policies_chroma(review, website, top_k=4, min_score=0.9):
     review_embedding = get_embedding(review)
     collection = collections.get(website)
     
@@ -55,24 +55,23 @@ def find_relevant_policies_chroma(review, website, top_k=3, min_score=0.75):
             query_embeddings=[review_embedding],
             n_results=top_k
         )
-        return results["documents"][0]
+        filtered_policies = []
+
+        for i, score in enumerate(results["distances"][0]):
+            if score >= min_score:
+                filtered_policies.append(results["documents"][0][i])
+
+        return filtered_policies
+        #return results["documents"][0]
     else:
-        return []
+        return ["No highly relevant policies found."]
 
-#
-
-def load_context(website):
-    filename = f"{website}_review_policies.txt"
-    with open(filename, 'r') as f:
-        content = f.read()
-    f.close()
-    return content
-
-
+# Counts tokens for given operation
 def count_tokens(text, model="gpt-4o-mini"):
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
+# Analyzes given review and returns a list of violated policies that are associated with it.
 def analyze_review(review, platform):
     relevant_policies = find_relevant_policies_chroma(review, platform)
     prompt = (
@@ -81,22 +80,19 @@ def analyze_review(review, platform):
         'You must always follow the exact json array format for your answer:  [ { "violated_policy_category" : "violated_policy_category_1", "policy_violation_reason": "Provide a concrete reason why this policy was violated by the review"}, ...] '
     )
 
-    #print(f"Tokens Used: {count_tokens(prompt)}")
-
-
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{ "role": "system", "content": f"You're a {platform} moderation assistant. Your goal is to evaluate provided user reviews based on the provided website review policies."},
                   {"role": "user", "content": prompt}]
     )
 
-    #print(f"Model reply: \n {response.choices[0].message.content}")
+    
 
     json_result = json.loads(response.choices[0].message.content)
 
     return json_result
 
-# Flask Connection
+# Flask Service Connection for endpoints
 
 app = Flask("GPT_Analysis")
 
@@ -122,7 +118,6 @@ def generate_embeddings_call():
 
 def main():
     app.run(debug=True, port=3500)
-
 
 
 if __name__ == "__main__":
