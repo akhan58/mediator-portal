@@ -46,7 +46,7 @@ const disputesAccessLayer = {
 
     //DELETE
     async deleteDispute(dispute_ID) {
-        const results =  await pool.query(`DELETE FROM disputes where "dispute_ID" = $1`,
+        const results =  await pool.query(`DELETE FROM disputes WHERE "dispute_ID" = $1`,
             [dispute_ID]);
         return results.rows;
     },

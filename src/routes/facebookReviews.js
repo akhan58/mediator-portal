@@ -20,7 +20,8 @@ const fetchFacebookReviews = async (pageId) => {
                 platform: 'Facebook',
                 rating: parseInt(review.rating) || 0,
                 content: review.review_text || '',
-                timestamp: new Date(review.created_time)
+                timestamp: new Date(review.created_time),
+                source_ID: review.reviewer
             }));
 
             return { reviews: transformedReviews, error: null};

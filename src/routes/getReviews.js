@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const reviewsAccessLayer = require('../models/reviewsAccessLayer');
+
 const { fetchGoogleReviews } = require('./googleReviews');
 const { fetchTrustpilotReviews } = require('./trustpilotReviews');
 const { fetchYelpReviews } = require ('./yelpReviews');
 const { fetchFacebookReviews } = require('./facebookReviews');
+
+const { validateId } = require('../validators/idValidation');
+const { validationResult } = require('express-validator');
 
 router.get('/google/:placeId', async (req, res) => {
     try {
@@ -17,8 +21,16 @@ router.get('/google/:placeId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await reviewsAccessLayer.createReview(review);
-            storedReviews.push(storedReview);
+            // Check if reviews already exists
+            const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_ID);
+
+            // Create if reviews does not exist
+            if (!existingReview) {
+                const storedReview = await reviewsAccessLayer.createReview(review);
+                storedReviews.push(storedReview);
+            } else { // Use existing reviews
+                storedReviews.push(existingReview);
+            }
         }
 
         res.status(200).json(storedReviews);
@@ -39,8 +51,16 @@ router.get('/trustpilot/:businessUnitId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await reviewsAccessLayer.createReview(review);
-            storedReviews.push(storedReview);
+            // Check if reviews already exists
+            const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_ID);
+
+            // Create if reviews does not exist
+            if (!existingReview) {
+                const storedReview = await reviewsAccessLayer.createReview(review);
+                storedReviews.push(storedReview);
+            } else { // Use existing reviews
+                storedReviews.push(existingReview);
+            }
         }
 
         res.status(200).json(storedReviews);
@@ -61,8 +81,16 @@ router.get('/yelp/:businessId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await reviewsAccessLayer.createReview(review);
-            storedReviews.push(storedReview);
+            // Check if reviews already exists
+            const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_ID);
+
+            // Create if reviews does not exist
+            if (!existingReview) {
+                const storedReview = await reviewsAccessLayer.createReview(review);
+                storedReviews.push(storedReview);
+            } else { // Use existing reviews
+                storedReviews.push(existingReview);
+            }
         }
 
         res.status(200).json(storedReviews);
@@ -83,8 +111,16 @@ router.get('/facebook/:pageId', async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
-            const storedReview = await reviewsAccessLayer.createReview(review);
-            storedReviews.push(storedReview);
+            // Check if reviews already exists
+            const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_ID);
+
+            // Create if reviews does not exist
+            if (!existingReview) {
+                const storedReview = await reviewsAccessLayer.createReview(review);
+                storedReviews.push(storedReview);
+            } else { // Use existing reviews
+                storedReviews.push(existingReview);
+            }
         }
 
         res.status(200).json(storedReviews);

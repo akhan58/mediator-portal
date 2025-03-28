@@ -46,7 +46,7 @@ const outreachAccessLayer = {
 
     //DELETE
     async deleteOutreach(outreach_ID) {
-        const results =  await pool.query(`DELETE FROM outreach where "outreach_ID" = $1`,
+        const results =  await pool.query(`DELETE FROM outreach WHERE "outreach_ID" = $1`,
             [outreach_ID]);
         return results.rows;
     },

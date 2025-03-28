@@ -19,7 +19,8 @@ CREATE TABLE public.reviews (
     platform character varying(255) NOT NULL,
     rating integer NOT NULL,
     content text NOT NULL,
-    "timestamp" date NOT NULL
+    "timestamp" date NOT NULL,
+    "source_ID" character varying(255) NOT NULL
 );
 
 
@@ -34,7 +35,7 @@ ALTER TABLE public.reviews ALTER COLUMN "review_ID" ADD GENERATED ALWAYS AS IDEN
     CACHE 1
 );
 
-COPY public.reviews ("review_ID", platform, rating, content, "timestamp") FROM stdin;
+COPY public.reviews ("review_ID", platform, rating, content, "timestamp", "source_ID") FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public."Reviews_review_ID_seq"', 1, false);
