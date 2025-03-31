@@ -1,10 +1,11 @@
-import openai, chromadb, tiktoken, json, os
+import openai, chromadb, tiktoken, json, os, psycopg2
 
 from flask import Flask, request, jsonify
 
 # Model API
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 
 if OPENAI_API_KEY == None or OPENAI_API_KEY.strip() == "":
     raise Exception("ERROR: OPENAI_API_KEY Environment variable is not set.")
@@ -71,8 +72,61 @@ def count_tokens(text, model="gpt-4o-mini"):
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
+# saves analysis of flagged review in the disputes database
+def save_review_analysis(review_id, analysis_json):
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv("HOST","localhost"),
+            database=os.getenv("DATABASE", "MediatorPortal"),
+            user=os.getenv("USER", "postgres"),
+            password=os.getenv("PASSWORD", "root"),
+            port=os.getenv("DB_PORT", 5432)
+        )
+        cur = conn.cursor()
+
+        flagged_reason = ''
+        for policy_json in analysis_json:
+            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}, "
+
+        query = f'INSERT INTO public.disputes("review_ID", flagged_reason) VALUES (%s, %s)'
+        cur.execute(query, (review_id, flagged_reason,))
+        conn.commit()
+        conn.close()
+    except psycopg2.Error as e:
+        print("Error inserting dispute: ", e)
+    
+# retrieves content, platform of a review from the database
+def load_review(review_id):
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv("HOST","localhost"),
+            database=os.getenv("DATABASE", "mediatorportal"),
+            user=os.getenv("USER", "postgres"),
+            password=os.getenv("PASSWORD", "root"),
+            port=os.getenv("DB_PORT", 5432)
+        )
+        cur = conn.cursor()
+
+        query = f'SELECT platform, content FROM public.reviews WHERE "review_ID"=%s'
+
+        cur.execute(query, (review_id,))
+        results = cur.fetchall()
+        if len(results)==0:
+            raise Exception(f"Review with review_id={review_id} was not found.")
+        
+        platform = results[0][0]
+        content = results[0][1]
+        conn.close()
+
+        return content, platform
+
+
+    except Exception as e:
+        print("Error selecting review: ", e)
+
+
 # Analyzes given review and returns a list of violated policies that are associated with it.
-def analyze_review(review, platform):
+def analyze_review(review_id, review, platform):
     relevant_policies = find_relevant_policies_chroma(review, platform)
     prompt = (
         f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {platform} review policies:"
@@ -89,6 +143,8 @@ def analyze_review(review, platform):
     
 
     json_result = json.loads(response.choices[0].message.content)
+    if len(json_result) > 0:
+        save_review_analysis(review_id, json_result)
 
     return json_result
 
@@ -101,10 +157,11 @@ app = Flask("GPT_Analysis")
 @app.route('/analyze-review', methods=['POST'])
 def analyze_review_call():
     data = request.json
-    review = data.get("review")
-    platform = data.get("platform")
+    review_id = data.get("review_id")
 
-    return jsonify(analyze_review(review, platform))
+    content, platform = load_review(review_id)
+
+    return jsonify(analyze_review(review_id, content, platform))
 
 # Endpoint to generate chroma-db with policy embeddings
 @app.route('/generate-embeddings', methods=['POST'])
