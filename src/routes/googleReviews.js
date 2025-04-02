@@ -14,7 +14,7 @@ const fetchGoogleReviews = async (placeId) => {
                 rating: parseInt(review.rating) || 0,
                 content: review.text || '',
                 timestamp: new Date(review.time * 1000),
-                source_ID: review.author_name
+                source_id: review.author_name
             }));
             
             return { reviews: transformedReviews, error: null};

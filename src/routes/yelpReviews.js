@@ -20,7 +20,7 @@ const fetchYelpReviews = async (businessId) => {
                 rating: parseInt(review.rating) || 0,
                 content: review.text || '',
                 timestamp: new Date(review.time_created),
-                source_ID: review.id
+                source_id: review.id
             }));
             
             return { reviews: transformedReviews, error: null};

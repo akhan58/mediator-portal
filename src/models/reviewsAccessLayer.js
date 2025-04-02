@@ -4,9 +4,9 @@ const pool = require("../config/db");
 const reviewsAccessLayer = {
 
     // CREATE
-    async createReview({platform, rating, content, timestamp, source_ID}) {
-        const results = await pool.query(`INSERT INTO reviews (platform, rating, content, timestamp, source_ID) VALUES ($1, $2, $3, $4, $5) RETURNING *`, 
-            [platform, rating, content, timestamp, source_ID]);
+    async createReview({platform, rating, content, timestamp, source_id}) {
+        const results = await pool.query(`INSERT INTO reviews (platform, rating, content, timestamp, source_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`, 
+            [platform, rating, content, timestamp, source_id]);
         return results.rows;
     },
 
@@ -17,9 +17,9 @@ const reviewsAccessLayer = {
     },
 
     // READ: get reviews by ID
-    async getReviewById(review_ID) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "review_ID" = $1`,
-            [review_ID]);
+    async getReviewById(review_id) {
+        const results =  await pool.query(`SELECT * FROM reviews WHERE "review_id" = $1`,
+            [review_id]);
         return results.rows;
     },
 
@@ -44,23 +44,23 @@ const reviewsAccessLayer = {
         return results.rows;
     },
 
-    // READ: get reviews by source_ID
-    async getReviewsByPlatformAndSourceId(platform, source_ID) {
-        const results = await pool.query(`SELECT * FROM reviews WHERE "platform" = $1 AND "source_ID" = $2`,
-            [platform, source_ID]);
+    // READ: get reviews by source_id
+    async getReviewsByPlatformAndSourceId(platform, source_id) {
+        const results = await pool.query(`SELECT * FROM reviews WHERE "platform" = $1 AND "source_id" = $2`,
+            [platform, source_id]);
             return results.rows;
     },
 
     // UPDATE
-    async updateReview({review_ID, rating, content}) {
-        const results = await pool.query(`UPDATE reviews SET rating=$2, content=$3 WHERE "review_ID"=$1 RETURNING *`, 
-            [review_ID, rating, content]);
+    async updateReview({review_id, rating, content}) {
+        const results = await pool.query(`UPDATE reviews SET rating=$2, content=$3 WHERE "review_id"=$1 RETURNING *`, 
+            [review_id, rating, content]);
         return results.rows;
     },
 
     // DELETE
-    async deleteReview(review_ID) {
-        const results =  await pool.query(`DELETE FROM reviews WHERE "review_ID" = $1`, [review_ID]);
+    async deleteReview(review_id) {
+        const results =  await pool.query(`DELETE FROM reviews WHERE "review_id" = $1`, [review_id]);
         return results.rows;
     },
 }

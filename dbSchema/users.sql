@@ -15,16 +15,15 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 CREATE TABLE public.users (
-    "user_ID" integer NOT NULL,
+    user_id integer NOT NULL,
     username character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
     password character varying(255) NOT NULL
 );
 
-
 ALTER TABLE public.users OWNER TO postgres;
 
-ALTER TABLE public.users ALTER COLUMN "user_ID" ADD GENERATED ALWAYS AS IDENTITY (
+ALTER TABLE public.users ALTER COLUMN user_id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Users_user_ID_seq"
     START WITH 1
     INCREMENT BY 1
@@ -33,10 +32,10 @@ ALTER TABLE public.users ALTER COLUMN "user_ID" ADD GENERATED ALWAYS AS IDENTITY
     CACHE 1
 );
 
-COPY public.users ("user_ID", username, email, password) FROM stdin;
+COPY public.users (user_id, username, email, password) FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public."Users_user_ID_seq"', 1, false);
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT "Users_pkey" PRIMARY KEY ("user_ID");
+    ADD CONSTRAINT "Users_pkey" PRIMARY KEY (user_id);

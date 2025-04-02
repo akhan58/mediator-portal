@@ -15,18 +15,19 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 CREATE TABLE public.disputes (
-    "dispute_ID" integer NOT NULL,
-    "review_ID" integer NOT NULL,
+    dispute_id integer NOT NULL,
+    review_id integer NOT NULL,
     flagged_reason text NOT NULL,
     dispute_status smallint DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE public.disputes OWNER TO postgres;
 
-COMMENT ON COLUMN public.disputes.dispute_status IS '0 = not resolved
-1 = resolved';
+COMMENT ON COLUMN public.disputes.dispute_status IS '0 = initiated
+1 = escalated
+2 = resolved';
 
-ALTER TABLE public.disputes ALTER COLUMN "dispute_ID" ADD GENERATED ALWAYS AS IDENTITY (
+ALTER TABLE public.disputes ALTER COLUMN dispute_id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Disputes_dispute_ID_seq"
     START WITH 1
     INCREMENT BY 1
@@ -35,17 +36,17 @@ ALTER TABLE public.disputes ALTER COLUMN "dispute_ID" ADD GENERATED ALWAYS AS ID
     CACHE 1
 );
 
-COPY public.disputes ("dispute_ID", "review_ID", flagged_reason, dispute_status) FROM stdin;
+COPY public.disputes (dispute_id, review_id, flagged_reason, dispute_status) FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public."Disputes_dispute_ID_seq"', 1, false);
 
 ALTER TABLE ONLY public.disputes
-    ADD CONSTRAINT "Disputes_pkey" PRIMARY KEY ("dispute_ID");
+    ADD CONSTRAINT "Disputes_pkey" PRIMARY KEY (dispute_id);
 
-CREATE INDEX "idx_disputes_reviewID" ON public.disputes USING btree ("review_ID") WITH (deduplicate_items='true');
+CREATE INDEX "idx_disputes_reviewId" ON public.disputes USING btree (review_id) WITH (deduplicate_items='true');
 
 CREATE INDEX idx_disputes_status ON public.disputes USING btree (dispute_status) WITH (deduplicate_items='true');
 
 ALTER TABLE ONLY public.disputes
-    ADD CONSTRAINT "review_ID_fkey" FOREIGN KEY ("review_ID") REFERENCES public.reviews("review_ID") ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT review_id_fkey FOREIGN KEY (review_id) REFERENCES public.reviews(review_id) ON UPDATE CASCADE ON DELETE CASCADE;

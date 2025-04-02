@@ -21,7 +21,7 @@ const fetchTrustpilotReviews = async (businessUnitId) => {
                 rating: parseInt(review.rating || review.stars) || 0,
                 content: review.text || '',
                 timestamp: new Date(review.createdAt),
-                source_ID: review.id
+                source_id: review.id
             }));
             
             return { reviews: transformedReviews, error: null};
