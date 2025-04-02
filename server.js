@@ -40,3 +40,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Connect mock review route
 const reviewMockRoutes = require('./src/routes/mockReviews');
 app.use('/api/mock-reviews', reviewMockRoutes);
+
+// Connect review reponses
+const reviewResponseRoutes = require('./src/routes/reviewResponse');
+app.use('/api/reviewResponse', reviewResponseRoutes);

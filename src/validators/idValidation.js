@@ -19,7 +19,7 @@ const validateStatusParam = [
     .notEmpty().withMessage(`disputeStatus is required`)
     .isInt({ min: 0, max: 2 }).withMessage('Status must be 0, 1, or 2')
     .toInt(),
-  ];
+];
 
 const validateDisputeStatusBody = [
     body('dispute_status')
