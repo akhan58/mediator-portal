@@ -2,7 +2,7 @@ import openai, chromadb, tiktoken, json, os, psycopg2
 
 from flask import Flask, request, jsonify
 
-# Model API
+# Model API connection
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -12,6 +12,30 @@ if OPENAI_API_KEY == None or OPENAI_API_KEY.strip() == "":
 
 openai.api_key = OPENAI_API_KEY
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
+
+# Database connection
+
+conn = None
+
+def get_postgres_conn():
+    try:
+        global conn
+
+        if conn != None:
+            return conn
+
+        conn = psycopg2.connect(
+            host=os.getenv("HOST"),
+            database=os.getenv("DATABASE"),
+            user=os.getenv("USER"),
+            password=os.getenv("PASSWORD"),
+            port=os.getenv("DB_PORT")
+        )
+        return conn
+    except psycopg2.Error as e:
+        print(f"Error connecting to postgres: {e}")
+
+
 
 collections = {
         "google": chroma_client.get_or_create_collection(name="google_policy_embeddings"),
@@ -47,7 +71,7 @@ def load_policies(platform=""):
                 )
 
 # Embeds the review and finds top_k closest policy violations
-def find_relevant_policies_chroma(review, website, top_k=4, min_score=0.9):
+def find_relevant_policies_chroma(review, website, top_k=3, min_score=0.8):
     review_embedding = get_embedding(review)
     collection = collections.get(website)
     
@@ -73,16 +97,11 @@ def count_tokens(text, model="gpt-4o-mini"):
     return len(encoding.encode(text))
 
 # saves analysis of flagged review in the disputes database
+'''
 def save_review_analysis(review_id, analysis_json):
     try:
-        conn = psycopg2.connect(
-            host=os.getenv("HOST","localhost"),
-            database=os.getenv("DATABASE", "MediatorPortal"),
-            user=os.getenv("USER", "postgres"),
-            password=os.getenv("PASSWORD", "root"),
-            port=os.getenv("DB_PORT", 5432)
-        )
-        cur = conn.cursor()
+        con = get_postgres_conn()
+        cur = con.cursor()
 
         flagged_reason = ''
         for policy_json in analysis_json:
@@ -90,43 +109,44 @@ def save_review_analysis(review_id, analysis_json):
 
         query = f'INSERT INTO public.disputes("review_ID", flagged_reason) VALUES (%s, %s)'
         cur.execute(query, (review_id, flagged_reason,))
-        conn.commit()
-        conn.close()
+        con.commit()
     except psycopg2.Error as e:
         print("Error inserting dispute: ", e)
-    
+
+'''
+
 # retrieves content, platform of a review from the database
-def load_review(review_id):
+def load_review(dispute_id=None, review_id=None):
     try:
-        conn = psycopg2.connect(
-            host=os.getenv("HOST","localhost"),
-            database=os.getenv("DATABASE", "mediatorportal"),
-            user=os.getenv("USER", "postgres"),
-            password=os.getenv("PASSWORD", "root"),
-            port=os.getenv("DB_PORT", 5432)
-        )
-        cur = conn.cursor()
-
-        query = f'SELECT platform, content FROM public.reviews WHERE "review_ID"=%s'
-
-        cur.execute(query, (review_id,))
+        con = get_postgres_conn()
+        cur = con.cursor()
+        if dispute_id != None:
+            query = f'SELECT r.platform, r.content FROM public.reviews r inner join public.disputes d on r.review_id = d.review_id where d.dispute_id=%s'
+            cur.execute(query, (dispute_id,))
+        
+        elif review_id != None:
+            query = f'SELECT r.platform, r.content FROM public.reviews r where r.review_id=%s'
+            cur.execute(query, (review_id,))
+        
+        else:
+            raise Exception(f"No load_review parameters provided.")
+        
         results = cur.fetchall()
         if len(results)==0:
-            raise Exception(f"Review with review_id={review_id} was not found.")
-        
+            raise Exception(f"Dispute with dispute_id={dispute_id} was not found.") 
+
         platform = results[0][0]
         content = results[0][1]
-        conn.close()
 
         return content, platform
 
 
     except Exception as e:
-        print("Error selecting review: ", e)
+        print(f"Error selecting review: {e}")
 
 
 # Analyzes given review and returns a list of violated policies that are associated with it.
-def analyze_review(review_id, review, platform):
+def analyze_review(review, platform):
     relevant_policies = find_relevant_policies_chroma(review, platform)
     prompt = (
         f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {platform} review policies:"
@@ -143,10 +163,23 @@ def analyze_review(review_id, review, platform):
     
 
     json_result = json.loads(response.choices[0].message.content)
-    if len(json_result) > 0:
-        save_review_analysis(review_id, json_result)
 
     return json_result
+
+def save_flagged_reasons(dispute_id, json_result):
+    try:
+        con = get_postgres_conn()
+        cur = con.cursor()
+
+        flagged_reason = ''
+        for policy_json in json_result:
+            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
+
+        query = f'update public.disputes set flagged_reason = %s where dispute_id=%s'
+        cur.execute(query, (flagged_reason, dispute_id))
+        con.commit()
+    except psycopg2.Error as e:
+        print(f"Error inserting dispute: {e}")
 
 # Flask Service Connection for endpoints
 
@@ -154,14 +187,32 @@ app = Flask("GPT_Analysis")
 
 
 # Endpoint to analyze review to see if it violates given platform policies
+@app.route('/dispute-set-flags', methods=['POST'])
+def dispute_set_flags_call():
+    data = request.json
+    dispute_id = data.get("dispute_id")
+
+    content, platform = load_review(dispute_id=dispute_id)
+    json_result = analyze_review(content, platform)
+    if len(json_result) > 0:
+        save_flagged_reasons(dispute_id, json_result)
+    else:
+        save_flagged_reasons(dispute_id, [{'violated_policy_category':"",'policy_violation_reason':"No policy violations found."}])
+    return jsonify(json_result)
+
+
 @app.route('/analyze-review', methods=['POST'])
 def analyze_review_call():
     data = request.json
     review_id = data.get("review_id")
+    content, platform = load_review(review_id=review_id)
+    json_result = analyze_review(content, platform)
+    analysis = ''
+    for policy_json in json_result:
+        analysis = f"{analysis} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
 
-    content, platform = load_review(review_id)
 
-    return jsonify(analyze_review(review_id, content, platform))
+    return jsonify({"analysis":analysis})
 
 # Endpoint to generate chroma-db with policy embeddings
 @app.route('/generate-embeddings', methods=['POST'])
