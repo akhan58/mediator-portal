@@ -10,13 +10,13 @@ const { fetchFacebookReviews } = require('./facebookReviews');
 const { validateId } = require('../validators/idValidation');
 const { validationResult } = require('express-validator');
 
-// HTTP Route -- fetch and store Google reviews
+// GET /api/reviews/google/placeId -- fetch and store Google reviews
 router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
 
     try {
@@ -49,13 +49,13 @@ router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
     }
 });
 
-// HTTP Route -- fetch and store Trustpilot reviews
+// GET /api/reviews/trustpilot/businessUnitId -- fetch and store Trustpilot reviews
 router.get('/trustpilot/:businessUnitId', validateId('businessUnitId'), async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
 
     try {
@@ -88,13 +88,13 @@ router.get('/trustpilot/:businessUnitId', validateId('businessUnitId'), async (r
     }
 });
 
-// HTTP Route -- fetch and store Yelp reviews
+// GET /api/reviews/yelp/businessId -- fetch and store Yelp reviews
 router.get('/yelp/:businessId', validateId('businessId'), async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
 
     try {
@@ -127,13 +127,13 @@ router.get('/yelp/:businessId', validateId('businessId'), async (req, res) => {
     }
 });
 
-// HTTP Route -- fetch and store Facebook reviews
+// GET /api/reviews/facebook/pageId -- fetch and store Facebook reviews
 router.get('/facebook/:pageId', validateId('pageId'), async (req, res) => {
     
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
 
     try {

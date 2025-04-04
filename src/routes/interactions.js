@@ -1,0 +1,127 @@
+const express = require('express');
+const router = express.Router();
+
+const interactionsAccessLayer = require('../models/interactionsAccessLayer');
+
+const { validateInt, validateInteractionResponseTextBody, validateInteractionsReviewIdBody} = require('../validators/idValidation');
+const { validationResult } = require('express-validator');
+
+// POST /api/interactions/respond — Respond to a review
+router.post('/respond', validateInteractionsReviewIdBody, validateInteractionResponseTextBody, async (req, res) => {
+
+    // Extract validation error into a result object
+    const result = validationResult(req);
+    if (!result.isEmpty()){
+        return res.status(400).json({errors: result.array() });
+    }
+
+    try {
+        const { reviewId, responseText } = req.body;
+        const interaction = await interactionsAccessLayer.createInteraction({
+            reviewId,
+            responseText
+        });
+
+        if (!interaction) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+
+        res.status(200).json({ message: 'Response saved successfully', interaction: interaction.rows[0] });
+    } catch (err) {
+        console.error('Error responding to review:', err);
+        res.status(500).json({ error: 'Server error while responding to review' });
+    }
+});
+
+// GET /api/interactions/responseId/responseId -- get interaction by response_id
+router.get('/responseId/:responseId', validateInt('responseId'), async (req, res) => {
+
+    // Extract validation error into a result object
+    const result = validationResult(req);
+    if (!result.isEmpty()){
+        return res.status(400).json({errors: result.array() });
+    }
+
+    try {
+        const interaction = await interactionsAccessLayer.getInteractionById(req.params.responseId);
+        
+        if (!interaction) {
+            return res.status(404).json({error: 'Interaction not found' });
+        }
+        res.status(200).json(interaction);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Failed to get Interaction"});
+    }
+});
+
+// GET /api/interactions/reviewId/reviewId -- get interaction by review_id
+router.get('/reviewId/:reviewId', validateInt('reviewId'), async (req, res) => {
+
+    // Extract validation error into a result object
+    const result = validationResult(req);
+    if (!result.isEmpty()){
+        return res.status(400).json({errors: result.array() });
+    }
+
+    try {
+        const interaction = await interactionsAccessLayer.getInteractionByReviewId(req.params.reviewId);
+        if (!interaction) {
+            return res.status(404).json({error: 'interaction not found' });
+        }
+        res.status(200).json(interaction);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Failed to get interaction by review id"});
+    }
+});
+
+// PUT /api/interactions/responseId -- update response text
+router.put('/:responseId', validateInt('responseId'), validateInteractionResponseTextBody, async (req, res) => {
+
+    // Extract validation error into a result object
+    const result = validationResult(req);
+    if (!result.isEmpty()){
+        return res.status(400).json({result: result.array() });
+    }
+
+    try {
+        const {responseText} = req.body;
+        const interaction = await interactionsAccessLayer.updateResponseText({
+            response_id: req.params.responseId,
+            responseText
+        });
+
+        if (!interaction) {
+            return res.status(404).json({error: 'Interaction not found' });
+        }
+        res.status(200).json(interaction);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Failed to update response text"});
+    }
+});
+
+// DELETE /api/disputes/disputesId -- delete dispute
+router.delete('/:responseId', validateInt('responseId'), async (req, res) => {
+
+    // Extract validation error into a result object
+    const result = validationResult(req);
+    if (!result.isEmpty()){
+        return res.status(400).json({result: result.array() });
+    }
+    
+    try {
+        const interaction = await interactionsAccessLayer.deleteInteraction(req.params.responseId);
+        
+        if (!interaction) {
+            return res.status(404).json({error: 'Interaction not found' });
+        }
+        res.status(200).json(interaction);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Failed to delete interaction"});
+    }
+});
+
+module.exports = router;

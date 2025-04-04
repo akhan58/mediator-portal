@@ -14,7 +14,7 @@ const validateInt = (idParam) => [
     .toInt()
 ];
 
-const validateStatusParam = [
+const validateDisputeStatusParam = [
     param('disputeStatus')
     .notEmpty().withMessage(`disputeStatus is required`)
     .isInt({ min: 0, max: 2 }).withMessage('Status must be 0, 1, or 2')
@@ -22,10 +22,29 @@ const validateStatusParam = [
 ];
 
 const validateDisputeStatusBody = [
-    body('dispute_status')
-    .notEmpty().withMessage('dispute_status is required')
-    .isInt({ min: 0, max: 2 }).withMessage('dispute_status must be 0, 1, or 2')
+    body('disputeStatus')
+    .notEmpty().withMessage('disputeStatus is required')
+    .isInt({ min: 0, max: 2 }).withMessage('disputeStatus must be 0, 1, or 2')
     .toInt()
 ];
 
-module.exports = { validateId, validateInt, validateDisputeStatusBody, validateStatusParam};
+const validateInteractionResponseTextBody = [
+    body('responseText')
+    .notEmpty().withMessage('responseText is required')
+    .isString().withMessage('responseText must be a string')
+    .trim()
+];
+
+const validateInteractionsReviewIdBody = [
+    body('reviewId')
+    .notEmpty().withMessage('reviewId is required')
+    .isInt({ min: 1 }).withMessage('reviewId must be an integer')
+    .toInt()
+];
+
+module.exports = { validateId,
+    validateInt, 
+    validateDisputeStatusBody, 
+    validateDisputeStatusParam, 
+    validateInteractionResponseTextBody, 
+    validateInteractionsReviewIdBody};

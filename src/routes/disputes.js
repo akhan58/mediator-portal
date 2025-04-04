@@ -4,10 +4,10 @@ const axios = require('axios');
 
 const disputesAccessLayer = require('../models/disputesAccessLayer');
 
-const { validateInt, validateDisputeStatusBody, validateStatusParam } = require('../validators/idValidation');
+const { validateInt, validateDisputeStatusBody, validateDisputeStatusParam } = require('../validators/idValidation');
 const { validationResult } = require('express-validator');
 
-// HTTP Route -- call the Flask API
+// POST /api/disputes/analyze/reviewId -- call the Flask API
 router.post('/analyze/:reviewId', validateInt('reviewId'), async (req, res) => {
     
     // Extract validation error into a result object
@@ -31,7 +31,7 @@ router.post('/analyze/:reviewId', validateInt('reviewId'), async (req, res) => {
     }
 });
 
-// HTTP Route -- get dipsutes by id
+// GET /api/disputes/disputeId/disputeId -- get dipsutes by dispute_id
 router.get('/disputeId/:disputeId', validateInt('disputeId'), async (req, res) => {
 
     // Extract validation error into a result object
@@ -53,7 +53,7 @@ router.get('/disputeId/:disputeId', validateInt('disputeId'), async (req, res) =
     }
 });
 
-// HTTP Route - get dispute by review_id
+// GET /api/disputes/reviewId/reviewId -- get dispute by review_id
 router.get('/reviewId/:reviewId', validateInt('reviewId'), async (req, res) => {
 
     // Extract validation error into a result object
@@ -74,8 +74,8 @@ router.get('/reviewId/:reviewId', validateInt('reviewId'), async (req, res) => {
     }
 });
 
-// HTTP Route -- get dispute by status
-router.get('/status/:disputeStatus', validateStatusParam, async (req, res) => {
+// GET /api/disputes/status/disputeStatus -- get dispute by status
+router.get('/status/:disputeStatus', validateDisputeStatusParam, async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
@@ -84,7 +84,7 @@ router.get('/status/:disputeStatus', validateStatusParam, async (req, res) => {
     }
 
     try {
-        const dispute = await disputesAccessLayer.getDisputesByStatus(req.params.status);
+        const dispute = await disputesAccessLayer.getDisputesByStatus(req.params.disputeStatus);
         if (!dispute) {
             return res.status(404).json({error: 'Dispute not found' });
         }
@@ -95,20 +95,20 @@ router.get('/status/:disputeStatus', validateStatusParam, async (req, res) => {
     }
 });
 
-// HTTP Route -- update dispute status
+// PUT /api/disputes/disputesId -- update dispute status
 router.put('/:disputeId', validateInt('disputeId'), validateDisputeStatusBody, async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
 
     try {
-        const {dispute_status} = req.body;
+        const {disputeStatus} = req.body;
         const dispute = await disputesAccessLayer.updateDispute({
             dispute_id: req.params.disputeId,
-            dispute_status
+            disputeStatus
         });
 
         if (!dispute) {
@@ -121,13 +121,13 @@ router.put('/:disputeId', validateInt('disputeId'), validateDisputeStatusBody, a
     }
 });
 
-// HTTP Route -- delete dispute
+// DELETE /api/disputes/disputesId -- delete dispute
 router.delete('/:disputeId', validateInt('disputeId'), async (req, res) => {
 
     // Extract validation error into a result object
     const result = validationResult(req);
     if (!result.isEmpty()){
-        return res.status(400).json({result: result.array() });
+        return res.status(400).json({errors: result.array() });
     }
     
     try {

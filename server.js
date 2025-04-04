@@ -42,5 +42,5 @@ const reviewMockRoutes = require('./src/routes/mockReviews');
 app.use('/api/mock-reviews', reviewMockRoutes);
 
 // Connect review reponses
-const reviewResponseRoutes = require('./src/routes/reviewResponse');
-app.use('/api/reviewResponse', reviewResponseRoutes);
+const reviewResponseRoutes = require('./src/routes/interactions');
+app.use('/api/interactions', reviewResponseRoutes);
