@@ -43,6 +43,15 @@ app.use('/api/mock-reviews', reviewMockRoutes);
 const reviewResponseRoutes = require('./src/routes/interactions');
 app.use('/api/interactions', reviewResponseRoutes);
 
+//Brand
+const brandRoutes = require('./src/routes/brand');
+app.use('/api/brand', brandRoutes);
+
+//response Links
+const responseLinkRoutes = require('./src/routes/responseLink');
+app.use('/api/responseLink', responseLinkRoutes);
+
 // Connect the dispute routes (temporarily commented until disputes.js is finished)
 const disputeRoutes = require('./src/routes/disputes');
 app.use('/api/disputes', disputeRoutes);
+
