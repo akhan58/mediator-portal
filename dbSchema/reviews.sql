@@ -20,7 +20,8 @@ CREATE TABLE public.reviews (
     rating integer NOT NULL,
     content text NOT NULL,
     "timestamp" date NOT NULL,
-    source_id character varying(255) NOT NULL
+    source_id character varying(255) NOT NULL,
+    user_id integer
 );
 
 ALTER TABLE public.reviews OWNER TO postgres;
@@ -34,7 +35,7 @@ ALTER TABLE public.reviews ALTER COLUMN review_id ADD GENERATED ALWAYS AS IDENTI
     CACHE 1
 );
 
-COPY public.reviews (review_id, platform, rating, content, "timestamp", source_id) FROM stdin;
+COPY public.reviews (review_id, platform, rating, content, "timestamp", source_id, user_id) FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public."Reviews_review_ID_seq"', 1, false);
@@ -49,3 +50,6 @@ CREATE INDEX idx_reviews_platform ON public.reviews USING btree (platform) WITH 
 CREATE INDEX idx_reviews_rating ON public.reviews USING btree (rating) WITH (deduplicate_items='true');
 
 CREATE INDEX idx_reviews_timestamp ON public.reviews USING btree ("timestamp") WITH (deduplicate_items='true');
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE SET NULL NOT VALID;

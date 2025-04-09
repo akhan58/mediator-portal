@@ -30,12 +30,18 @@ router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
+            // Add user_id from users table to reviews
+            /*const usersIdToReviews = {
+                ...review,
+                user_id: req.user.id
+            };*/
+
             // Check if reviews already exists
             const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_id);
 
             // Create if reviews does not exist
             if (!existingReview) {
-                const storedReview = await reviewsAccessLayer.createReview(review);
+                const storedReview = await reviewsAccessLayer.createReview(review /*usersIdToReviews*/);
                 storedReviews.push(storedReview);
             } else { // Use existing reviews
                 storedReviews.push(existingReview);
@@ -69,12 +75,18 @@ router.get('/trustpilot/:businessUnitId', validateId('businessUnitId'), async (r
         const storedReviews= [];
 
         for (const review of reviews) {
+            // Add user_id from users table to reviews
+            /*const usersIdToReviews = {
+                ...review,
+                user_id: req.user.id
+            };*/
+
             // Check if reviews already exists
             const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_id);
 
             // Create if reviews does not exist
             if (!existingReview) {
-                const storedReview = await reviewsAccessLayer.createReview(review);
+                const storedReview = await reviewsAccessLayer.createReview(review /*usersIdToReviews*/);
                 storedReviews.push(storedReview);
             } else { // Use existing reviews
                 storedReviews.push(existingReview);
@@ -108,12 +120,18 @@ router.get('/yelp/:businessId', validateId('businessId'), async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
+            // Add user_id from users table to reviews
+            /*const usersIdToReviews = {
+                ...review,
+                user_id: req.user.id
+            };*/
+
             // Check if reviews already exists
             const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_id);
 
             // Create if reviews does not exist
             if (!existingReview) {
-                const storedReview = await reviewsAccessLayer.createReview(review);
+                const storedReview = await reviewsAccessLayer.createReview(review /*usersIdToReviews*/);
                 storedReviews.push(storedReview);
             } else { // Use existing reviews
                 storedReviews.push(existingReview);
@@ -147,12 +165,18 @@ router.get('/facebook/:pageId', validateId('pageId'), async (req, res) => {
         const storedReviews= [];
 
         for (const review of reviews) {
+            // Add user_id from users table to reviews
+            /*const usersIdToReviews = {
+                ...review,
+                user_id: req.user.id
+            };*/
+
             // Check if reviews already exists
             const existingReview = await reviewsAccessLayer.getReviewsByPlatformAndSourceId(review.platform, review.source_id);
 
             // Create if reviews does not exist
             if (!existingReview) {
-                const storedReview = await reviewsAccessLayer.createReview(review);
+                const storedReview = await reviewsAccessLayer.createReview(review /*usersIdToReviews*/);
                 storedReviews.push(storedReview);
             } else { // Use existing reviews
                 storedReviews.push(existingReview);

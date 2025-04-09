@@ -4,9 +4,9 @@ const pool = require("../config/db");
 const disputesAccessLayer = {
 
     // CREATE
-    async createDispute ({review_id, flagged_reason}) {
+    async createDispute ({reviewId, flaggedReason}) {
         const results = await pool.query(`INSERT INTO disputes (review_id, flagged_reason, dispute_status) VALUES ($1, $2, 0) RETURNING *`, 
-            [review_id, flagged_reason]);
+            [reviewId, flaggedReason]);
         return results.rows;
     },
 
@@ -16,38 +16,38 @@ const disputesAccessLayer = {
         return results.rows;
     },
 
-    // READ: get disputes by ID
-    async getDisputeById(dispute_id) {
+    // READ: get disputes by dispute_id
+    async getDisputeById(disputeId) {
         const results =  await pool.query(`SELECT * FROM disputes WHERE "dispute_id" = $1`,
-            [dispute_id]);
+            [disputeId]);
         return results.rows;
     },
 
-    // READ: get disputes by reviewID
-    async getDisputeByReviewId(review_id) {
+    // READ: get disputes by review_iD
+    async getDisputeByReviewId(reviewId) {
         const results =  await pool.query(`SELECT * FROM disputes WHERE "review_id" = $1`,
-            [review_id]);
+            [reviewId]);
         return results.rows;
     },
 
     // READ: get disputes by status
-    async getDisputesByStatus (dispute_status) {
+    async getDisputesByStatus (disputeStatus) {
         const results = await pool.query(`SELECT * FROM disputes WHERE "dispute_status" = $1`,
-            [dispute_status]);
+            [disputeStatus]);
             return results.rows;
     },
 
     // UPDATE: update dispute status
-    async updateDispute ({dispute_id, dispute_status}) {
+    async updateDispute ({disputeId, disputeStatus}) {
         const results = await pool.query(`UPDATE disputes SET dispute_status=$2 WHERE "dispute_id"=$1 RETURNING *`, 
-            [dispute_id, dispute_status]);
+            [disputeId, disputeStatus]);
         return results.rows;
     },
 
     //DELETE
-    async deleteDispute(dispute_id) {
+    async deleteDispute(disputeId) {
         const results =  await pool.query(`DELETE FROM disputes WHERE "dispute_id" = $1`,
-            [dispute_id]);
+            [disputeId]);
         return results.rows;
     },
 }

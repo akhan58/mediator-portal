@@ -18,7 +18,8 @@ CREATE TABLE public.interactions (
     response_id integer NOT NULL,
     review_id integer NOT NULL,
     response_text text NOT NULL,
-    created_at date DEFAULT CURRENT_DATE
+    created_at timestamp without time zone,
+    user_id integer
 );
 
 ALTER TABLE public.interactions OWNER TO postgres;
@@ -32,7 +33,7 @@ ALTER TABLE public.interactions ALTER COLUMN response_id ADD GENERATED ALWAYS AS
     CACHE 1
 );
 
-COPY public.interactions (response_id, review_id, response_text, created_at) FROM stdin;
+COPY public.interactions (response_id, review_id, response_text, created_at, user_id) FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public.interactions_response_id_seq', 1, false);
@@ -44,3 +45,6 @@ CREATE INDEX "idx_interactions_reviewId" ON public.interactions USING btree (rev
 
 ALTER TABLE ONLY public.interactions
     ADD CONSTRAINT review_id_fkey FOREIGN KEY (review_id) REFERENCES public.reviews(review_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.interactions
+    ADD CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE SET NULL NOT VALID;

@@ -4,9 +4,9 @@ const pool = require("../config/db");
 const outreachAccessLayer = {
 
     // CREATE
-    async createOutreach ({review_id, call_history, resolution_status}) {
+    async createOutreach ({reviewId, callHistory, resolutionStatus}) {
         const results = await pool.query(`INSERT INTO outreach (review_id, call_history, resolution_status) VALUES ($1, $2, 0) RETURNING *`, 
-            [review_id, call_history, resolution_status]);
+            [reviewId, callHistory, resolutionStatus]);
         return results.rows;
     },
 
@@ -17,37 +17,37 @@ const outreachAccessLayer = {
     },
 
     // READ: get outreach by ID
-    async getOutreachById(outreach_id) {
+    async getOutreachById(outreachId) {
         const results =  await pool.query(`SELECT * FROM outreach WHERE "outreach_id" = $1`,
-            [outreach_id]);
+            [outreachId]);
         return results.rows;
     },
 
     // READ: get outreach by reviewID
-    async getOutreachByReviewId(review_id) {
+    async getOutreachByReviewId(reviewId) {
         const results =  await pool.query(`SELECT * FROM outreach WHERE "review_id" = $1`,
-            [review_id]);
+            [reviewId]);
         return results.rows;
     },
 
     // READ: get outreach by status
-    async getoutreachByStatus (resolution_status) {
+    async getoutreachByStatus (resolutionStatus) {
         const results = await pool.query(`SELECT * FROM outreach WHERE "resolution_status" = $1,`,
-            [resolution_status]);
+            [resolutionStatus]);
             return results.rows;
     },
 
     // UPDATE: update Outreach status
-    async updateOutreach ({outreach_id, resolution_status}) {
+    async updateOutreach ({outreachId, resolutionStatus}) {
         const results = await pool.query(`UPDATE outreach SET resolution_status=$2 WHERE "outreach_id"=$1 RETURNING *`, 
-            [outreach_id, resolution_status]);
+            [outreachId, resolutionStatus]);
         return results.rows;
     },
 
     //DELETE
-    async deleteOutreach(outreach_id) {
+    async deleteOutreach(outreachId) {  
         const results =  await pool.query(`DELETE FROM outreach WHERE "outreach_id" = $1`,
-            [outreach_id]);
+            [outreachId]);
         return results.rows;
     },
 }

@@ -1,12 +1,12 @@
 const pool = require("../config/db");
 
 // CRUD functions
-const responseAccessLayer = {
+const interactionsAccessLayer = {
 
     // CREATE
-    async createInteraction ({reviewId, responseText}) {
-        const results = await pool.query(`INSERT INTO interactions (review_id, response_text) VALUES ($1, $2) RETURNING *`, 
-            [reviewId, responseText]);
+    async createInteraction ({reviewId, responseText, userId}) {
+        const results = await pool.query(`INSERT INTO interactions (review_id, response_text, user_id) VALUES ($1, $2, $3) RETURNING *`, 
+            [reviewId, responseText, userId]);
         return results.rows;
     },
 
@@ -16,17 +16,24 @@ const responseAccessLayer = {
         return results.rows;
     },
 
-    // READ: get interactions by ID
+    // READ: get interactions by response_id
     async getInteractionById(responseId) {
         const results =  await pool.query(`SELECT * FROM interactions WHERE "response_id" = $1`,
             [responseId]);
         return results.rows;
     },
 
-    // READ: get interactions by reviewID
+    // READ: get interactions by review_id
     async getInteractionByReviewId(reviewId) {
         const results =  await pool.query(`SELECT * FROM interactions WHERE "review_id" = $1`,
             [reviewId]);
+        return results.rows;
+    },
+
+    // READ: get interactions by review_id
+    async getInteractionByUserId(userId) {
+        const results =  await pool.query(`SELECT * FROM interactions WHERE "user_id" = $1`,
+            [userId]);
         return results.rows;
     },
 
@@ -45,4 +52,4 @@ const responseAccessLayer = {
     },
 }
 
-module.exports = responseAccessLayer;
+module.exports = interactionsAccessLayer;

@@ -19,7 +19,8 @@ router.post('/respond', validateInteractionsReviewIdBody, validateInteractionRes
         const { reviewId, responseText } = req.body;
         const interaction = await interactionsAccessLayer.createInteraction({
             reviewId,
-            responseText
+            responseText,
+            /*user_id: req.user.id*/
         });
 
         if (!interaction) {
@@ -102,7 +103,7 @@ router.put('/:responseId', validateInt('responseId'), validateInteractionRespons
     }
 });
 
-// DELETE /api/disputes/disputesId -- delete dispute
+// DELETE /api/interactions/responseId -- delete dispute
 router.delete('/:responseId', validateInt('responseId'), async (req, res) => {
 
     // Extract validation error into a result object
