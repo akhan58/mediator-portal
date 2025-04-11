@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const reviewsAccessLayer = require('../models/reviewsAccessLayer');
+const businessAccessLayer = require('../models/businessesAccessLayer');
 
 const { fetchGoogleReviews } = require('./googleReviews');
 const { fetchTrustpilotReviews } = require('./trustpilotReviews');
@@ -9,6 +10,9 @@ const { fetchFacebookReviews } = require('./facebookReviews');
 
 const { validateId } = require('../validators/idValidation');
 const { validationResult } = require('express-validator');
+
+// Add authentication middleware when finished
+// const auth = require('');
 
 // GET /api/reviews/google/placeId -- fetch and store Google reviews
 router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
@@ -20,8 +24,19 @@ router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
     }
 
     try {
+        // Get business profile for the logged in user
+        const business = await businessAccessLayer.getBusinessByUserId(req.user.id); // from auth middleware
+
+        if (!business) {
+            return res.status(404).json({ error: "Business profile not found" });
+        }
+        
+        if (!business.google_place_id) {
+            return res.status(400).json({ error: "Google Place ID not configured" });
+        }
+
         // Fetch reviews from Google API
-        const {reviews, error} = await fetchGoogleReviews(req.params.placeId);
+        const {reviews, error} = await fetchGoogleReviews(req.params.placeId /*business.google_place_id*/);
 
         if (error) {
             return res.status(400).json({ error });
@@ -65,8 +80,19 @@ router.get('/trustpilot/:businessUnitId', validateId('businessUnitId'), async (r
     }
 
     try {
+        // Get business profile for the logged in user
+        const business = await businessAccessLayer.getBusinessByUserId(req.user.id); // from auth middleware
+
+        if (!business) {
+            return res.status(404).json({ error: "Business profile not found" });
+        }
+        
+        if (!business.trustpilot_businessunit_id) {
+            return res.status(400).json({ error: "Trustpilot Business Unit ID not configured" });
+        }
+
         // Fetch reviews from Trustpilot API
-        const {reviews, error} = await fetchTrustpilotReviews(req.params.businessUnitId);
+        const {reviews, error} = await fetchTrustpilotReviews(req.params.businessUnitId /*business.trustpilot_businessunit_id*/);
 
         if (error) {
             return res.status(400).json({ error });
@@ -110,8 +136,19 @@ router.get('/yelp/:businessId', validateId('businessId'), async (req, res) => {
     }
 
     try {
+        // Get business profile for the logged in user
+        const business = await businessAccessLayer.getBusinessByUserId(req.user.id); // from auth middleware
+
+        if (!business) {
+            return res.status(404).json({ error: "Business profile not found" });
+        }
+        
+        if (!business.yelp_business_id) {
+            return res.status(400).json({ error: "Yelp Business ID not configured" });
+        }
+
         // Fetch reviews from Yelp API
-        const {reviews, error} = await fetchYelpReviews(req.params.businessId);
+        const {reviews, error} = await fetchYelpReviews(req.params.businessId /*business.yelp_business_id*/);
 
         if (error) {
             return res.status(400).json({ error });
@@ -155,8 +192,19 @@ router.get('/facebook/:pageId', validateId('pageId'), async (req, res) => {
     }
 
     try {
+        // Get business profile for the logged in user
+        const business = await businessAccessLayer.getBusinessByUserId(req.user.id); // from auth middleware
+
+        if (!business) {
+            return res.status(404).json({ error: "Business profile not found" });
+        }
+        
+        if (!business.facebook_page_id) {
+            return res.status(400).json({ error: "Facebook Page ID not configured" });
+        }
+
         // Fetch reviews from Facebook API
-        const {reviews, error} = await fetchFacebookReviews(req.params.pageId);
+        const {reviews, error} = await fetchFacebookReviews(req.params.pageId /*business.facebook_page_id*/);
 
         if (error) {
             return res.status(400).json({ error });
