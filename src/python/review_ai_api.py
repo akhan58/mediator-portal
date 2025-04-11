@@ -145,13 +145,14 @@ def load_review(dispute_id=None, review_id=None):
         print(f"Error selecting review: {e}")
 
 
-# Analyzes given review and returns a list of violated policies that are associated with it.
+# Analyzes given review and returns a JSON formatted list of "violation_type", "reasoning", "text", "confidence_score" for each policy violation
 def analyze_review(review, platform):
     relevant_policies = find_relevant_policies_chroma(review, platform)
+
     prompt = (
         f"Analyze this user's review: \"{review}\" and return the list of violated policy categories from the following list and the {platform} review policies:"
         f"Suspected violated policy categories: {relevant_policies}"
-        'You must always follow the exact json array format for your answer:  [ { "violated_policy_category" : "violated_policy_category_1", "policy_violation_reason": "Provide a concrete reason why this policy was violated by the review"}, ...] '
+        'You must always follow the exact json array format for your answer:  [ { "violation_type" : "Provide a concrete category of the violated policy based on the {platform} review policies", "reasoning": "Provide a concrete reason why this policy was violated by the review", "text":"Specific segment of the provided review that caused the noted policy violation that was stored in the field \"violation_type\"", "confidence_score":"Provide a confidence score that this concrete policy violation is true (from 0 to 1 with 3 digits precision where 0 means that this review does not violate the policy at all and 1 means the maximum confidence)"}, ...] '
     )
 
     response = openai.chat.completions.create(
@@ -160,12 +161,19 @@ def analyze_review(review, platform):
                   {"role": "user", "content": prompt}]
     )
 
-    
+    response_content = response.choices[0].message.content
 
-    json_result = json.loads(response.choices[0].message.content)
+    try:
+        json_result = json.loads(response_content)
+    
+    except Exception as e:
+        return { "LLM_Response":response_content, "Error": str(e), "content":review, "platform":platform}   
+    
+    if json_result == None:
+        return { "LLM_Response":response_content, "content":review, "platform":platform, "Error":f"Unable to parse the LMM response." }
 
     return json_result
-
+'''
 def save_flagged_reasons(dispute_id, json_result):
     try:
         con = get_postgres_conn()
@@ -180,6 +188,7 @@ def save_flagged_reasons(dispute_id, json_result):
         con.commit()
     except psycopg2.Error as e:
         print(f"Error inserting dispute: {e}")
+'''
 
 # Flask Service Connection for endpoints
 
@@ -187,6 +196,7 @@ app = Flask("GPT_Analysis")
 
 
 # Endpoint to analyze review to see if it violates given platform policies
+'''
 @app.route('/dispute-set-flags', methods=['POST'])
 def dispute_set_flags_call():
     data = request.json
@@ -199,7 +209,7 @@ def dispute_set_flags_call():
     else:
         save_flagged_reasons(dispute_id, [{'violated_policy_category':"",'policy_violation_reason':"No policy violations found."}])
     return jsonify(json_result)
-
+'''
 
 @app.route('/analyze-review', methods=['POST'])
 def analyze_review_call():
@@ -207,12 +217,27 @@ def analyze_review_call():
     review_id = data.get("review_id")
     content, platform = load_review(review_id=review_id)
     json_result = analyze_review(content, platform)
+
+    return jsonify(json_result)
+
+@app.route('/analyze-review-text', methods=['POST'])
+def analyze_review_text_call():
+    data = request.json
+    content = data.get("content")
+    platform = data.get("platform")
+
+    if content == None or content.strip() == "" or platform == None or platform.strip() == "":
+        return jsonify({"Error":"Missing / Empty content or platform parameters.","Content":data})
+
+    json_result = analyze_review(content, platform)
+    '''
     analysis = ''
     for policy_json in json_result:
         analysis = f"{analysis} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
+    '''
 
+    return jsonify(json_result)
 
-    return jsonify({"analysis":analysis})
 
 # Endpoint to generate chroma-db with policy embeddings
 @app.route('/generate-embeddings', methods=['POST'])
