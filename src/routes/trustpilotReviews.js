@@ -1,8 +1,56 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const fetchTrustpilotReviews = async (businessUnitId) => {
+// Extracts Trustpilot business ID from URL
+const extractTrustpilotBusinessId = (url) => {
+    try {
+        // Handle different Trustpilot URL formats
+        const match = url.match(/trustpilot\.com\/review\/([^/?]+)/i);
+        if (!match) throw new Error('Invalid Trustpilot URL format');
+        return match[1];
+    } catch (err) {
+        console.error("URL parsing error:", err);
+        return null;
+    }
+};
+
+// Finds Business Unit ID from business ID (domain name)
+const findTrustpilotBusinessUnitId = async (businessId) => {
+    try {
+        const response = await axios.get(
+            `https://api.trustpilot.com/v1/business-units/find?name=${businessId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.TRUSTPILOT_API_KEY}`,
+              },
+            }
+        );
+
+        return response.data?.id || null;
+    } catch (err) {
+        console.error("Business Unit ID lookup error:", err.response?.data || err.message);
+        return null;
+    }
+};
+
+const fetchTrustpilotReviews = async (identifier) => {
     const trustpilotApiKey = process.env.TRUSTPILOT_API_KEY;
+    let businessUnitId = identifier;
+    let businessId = null;
+
+    // If identifier is a URL, extract the business ID first
+    if (identifier.includes('trustpilot.com')) {
+        businessId = extractTrustpilotBusinessId(identifier);
+        if (!businessId) {
+            return { reviews: [], error: "Invalid Trustpilot URL" };
+        }
+        
+        // Then find the Business Unit ID
+        businessUnitId = await findTrustpilotBusinessUnitId(businessId);
+        if (!businessUnitId) {
+            return { reviews: [], error: "Could not find Business Unit ID" };
+        }
+    }
 
     try {
         const response = await axios.get(

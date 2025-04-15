@@ -1,8 +1,31 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const fetchYelpReviews = async (businessId) => {
+const extractYelpBusinessId = (url) => {
+    try {
+        const match = url.match(/yelp\.com\/biz\/([^/?]+)/);
+        if (!match) throw new Error('Invalid Yelp URL format');
+        return match[1];
+
+    } catch (err) {
+        console.error("URL parsing error:", err);
+        return null;
+    }
+};
+
+
+const fetchYelpReviews = async (identifier) => {
     const yelpApiKey = process.env.YELP_API_KEY;
+    let businessId = identifier
+
+    // If identifier is a URL, extract the business ID
+    if (identifier.includes('yelp.com')) {
+        businessId = extractYelpBusinessId(identifier);
+
+        if (!businessId) {
+            return { reviews: [], error: "Invalid Yelp URL" };
+        }
+    }
 
     try {
         const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`,
