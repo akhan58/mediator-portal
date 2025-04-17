@@ -4,10 +4,10 @@ const pool = require("../config/db");
 const disputesAccessLayer = {
 
     // CREATE
-    async createDispute ({reviewId, flaggedReason}) {
-        const results = await pool.query(`INSERT INTO disputes (review_id, flagged_reason, dispute_status) VALUES ($1, $2, 0) RETURNING *`, 
-            [reviewId, flaggedReason]);
-        return results.rows;
+    async createDispute ({reviewId, flaggedReason, analysisData}) {
+        const results = await pool.query(`INSERT INTO disputes (review_id, flagged_reason, dispute_status, analysis_data) VALUES ($1, $2, 0, $3) RETURNING *`, 
+            [reviewId, flaggedReason, analysisData]);
+        return results.rows[0];
     },
 
     // READ
@@ -20,14 +20,14 @@ const disputesAccessLayer = {
     async getDisputeById(disputeId) {
         const results =  await pool.query(`SELECT * FROM disputes WHERE "dispute_id" = $1`,
             [disputeId]);
-        return results.rows;
+        return results.rows[0];
     },
 
     // READ: get disputes by review_iD
     async getDisputeByReviewId(reviewId) {
         const results =  await pool.query(`SELECT * FROM disputes WHERE "review_id" = $1`,
             [reviewId]);
-        return results.rows;
+        return results.rows[0];
     },
 
     // READ: get disputes by status
@@ -41,7 +41,7 @@ const disputesAccessLayer = {
     async updateDispute ({disputeId, disputeStatus}) {
         const results = await pool.query(`UPDATE disputes SET dispute_status=$2 WHERE "dispute_id"=$1 RETURNING *`, 
             [disputeId, disputeStatus]);
-        return results.rows;
+        return results.rows[0];
     },
 
     //DELETE

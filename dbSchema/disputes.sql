@@ -17,9 +17,11 @@ SET default_table_access_method = heap;
 CREATE TABLE public.disputes (
     dispute_id integer NOT NULL,
     review_id integer NOT NULL,
-    flagged_reason text NOT NULL,
-    dispute_status smallint DEFAULT 0 NOT NULL
+    flagged_reason text,
+    dispute_status smallint DEFAULT 0 NOT NULL,
+    analysis_data jsonb
 );
+
 
 ALTER TABLE public.disputes OWNER TO postgres;
 
@@ -36,7 +38,7 @@ ALTER TABLE public.disputes ALTER COLUMN dispute_id ADD GENERATED ALWAYS AS IDEN
     CACHE 1
 );
 
-COPY public.disputes (dispute_id, review_id, flagged_reason, dispute_status) FROM stdin;
+COPY public.disputes (dispute_id, review_id, flagged_reason, dispute_status, analysis_data) FROM stdin;
 \.
 
 SELECT pg_catalog.setval('public."Disputes_dispute_ID_seq"', 1, false);

@@ -24,7 +24,14 @@ router.post('/analyze/:reviewId', validateInt('reviewId'), async (req, res) => {
             review_id: reviewId
         });
 
-        res.status(200).json(response.data);
+        // Create dispute with analysis data
+        const dispute = await disputesAccessLayer.createDispute({
+            reviewId,
+            flaggedReason: " ",
+            analysisData: response.data
+        });
+
+        res.status(200).json(dispute);
     } catch (err) {
         console.error(err);
         res.status(500).json({error: "Failed to analyze reviews"});
