@@ -33,8 +33,6 @@ ALTER TABLE public.users ALTER COLUMN user_id ADD GENERATED ALWAYS AS IDENTITY (
 );
 
 COPY public.users (user_id, username, email, password) FROM stdin;
-\.
-
 SELECT pg_catalog.setval('public."Users_user_ID_seq"', 1, false);
 
 ALTER TABLE ONLY public.users

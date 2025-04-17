@@ -36,7 +36,6 @@ ALTER TABLE public.outreach ALTER COLUMN outreach_id ADD GENERATED ALWAYS AS IDE
 );
 
 COPY public.outreach (outreach_id, review_id, call_history, resolution_status) FROM stdin;
-\.
 
 SELECT pg_catalog.setval('public."Outreach_outreach_ID_seq"', 1, false);
 

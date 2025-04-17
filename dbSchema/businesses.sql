@@ -36,7 +36,6 @@ ALTER TABLE public.businesses ALTER COLUMN business_id ADD GENERATED ALWAYS AS I
 );
 
 COPY public.businesses (business_id, business_name, user_id, facebook_page_id, google_place_id, trustpilot_businessunit_id, yelp_business_id) FROM stdin;
-\.
 
 SELECT pg_catalog.setval('public.businesses_business_id_seq', 1, false);
 
