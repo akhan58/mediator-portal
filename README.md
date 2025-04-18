@@ -10,6 +10,7 @@ And then, in another terminal:
 ```npm run test```
 
 Running tests depends on a working Postgresql database. Message Thienn if you need help setting it up.
+**All tests reset the postgresql database.**
 
 ## Frontend
 
