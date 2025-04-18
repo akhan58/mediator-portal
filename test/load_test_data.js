@@ -53,8 +53,8 @@ const setup = async () => {
     },
     {
       platform: "Trustpilot",
-      rating: 3,
-      content: "Its's okay!",
+      rating: 1,
+      content: "These guys are evil and criminals and should go to jail.",
       timestamp: "2025-01-03T06:00:00.000Z",
       sourceId: 1,
       userId: user_id,
