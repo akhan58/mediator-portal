@@ -34,8 +34,6 @@ ALTER TABLE public.interactions ALTER COLUMN response_id ADD GENERATED ALWAYS AS
 );
 
 COPY public.interactions (response_id, review_id, response_text, created_at, user_id) FROM stdin;
-\.
-
 SELECT pg_catalog.setval('public.interactions_response_id_seq', 1, false);
 
 ALTER TABLE ONLY public.interactions

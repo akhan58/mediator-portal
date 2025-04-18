@@ -34,7 +34,7 @@ router.get('/google/:placeId', validateId('placeId'), async (req, res) => {
         if (!business.google_place_id) {
             return res.status(400).json({ error: "Google Place ID not configured" });
         }
-
+        
         // Fetch reviews from Google API
         const {reviews, error} = await fetchGoogleReviews(req.params.placeId /*business.google_place_id*/);
 
@@ -136,6 +136,7 @@ router.get('/yelp/:businessId', validateId('businessId'), async (req, res) => {
     }
 
     try {
+        
         // Get business profile for the logged in user
         const business = await businessAccessLayer.getBusinessByUserId(req.user.id); // from auth middleware
 

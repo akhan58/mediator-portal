@@ -1,5 +1,17 @@
 # mediator-portal
 
+## Running tests
+In one terminal:
+
+```npm start```
+
+And then, in another terminal:
+
+```npm run test```
+
+Running tests depends on a working Postgresql database. Message Thienn if you need help setting it up.
+**All tests reset the postgresql database.**
+
 ## Frontend
 
 The frontend of this project is based off of the schema defined in our figma: https://www.figma.com/design/k3WV6n6WadgTqRXme2QDWB/Wireframes?node-id=0-1&t=ukPaoBTeJuedO46a-1

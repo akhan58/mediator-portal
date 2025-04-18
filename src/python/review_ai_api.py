@@ -1,9 +1,11 @@
 import openai, chromadb, tiktoken, json, os, psycopg2
+from dotenv import load_dotenv
 
 from flask import Flask, request, jsonify
 
 # Model API connection
 
+load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
