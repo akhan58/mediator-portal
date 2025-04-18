@@ -19,6 +19,7 @@ CREATE TABLE public.disputes (
     review_id integer NOT NULL,
     flagged_reason text NOT NULL,
     dispute_status smallint DEFAULT 0 NOT NULL
+    analysis_data jsonb
 );
 
 ALTER TABLE public.disputes OWNER TO postgres;
