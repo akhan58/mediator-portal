@@ -1,7 +1,13 @@
 # mediator-portal
 
 ## Running tests
-`npm run test`
+In one terminal:
+
+```npm start```
+
+And then, in another terminal:
+
+```npm run test```
 
 Running tests depends on a working Postgresql database. Message Thienn if you need help setting it up.
 
