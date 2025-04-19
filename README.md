@@ -1,6 +1,8 @@
 # mediator-portal
 
 ## Running tests
+**Keep in mind that tests are currently being developed, and tests that depend on missing features will automatically fail. If you add a missing feature, please remove the line of code that manually fails the tests.**
+
 In one terminal:
 
 ```npm start```
