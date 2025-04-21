@@ -38,7 +38,7 @@ def get_postgres_conn():
         print(f"Error connecting to postgres: {e}")
 
 
-
+# Collections that are used to generate embeddings with website review policies
 collections = {
         "google": chroma_client.get_or_create_collection(name="google_policy_embeddings"),
         "meta": chroma_client.get_or_create_collection(name="meta_policy_embeddings"),
@@ -98,24 +98,7 @@ def count_tokens(text, model="gpt-4o-mini"):
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
-# saves analysis of flagged review in the disputes database
-'''
-def save_review_analysis(review_id, analysis_json):
-    try:
-        con = get_postgres_conn()
-        cur = con.cursor()
 
-        flagged_reason = ''
-        for policy_json in analysis_json:
-            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}, "
-
-        query = f'INSERT INTO public.disputes("review_ID", flagged_reason) VALUES (%s, %s)'
-        cur.execute(query, (review_id, flagged_reason,))
-        con.commit()
-    except psycopg2.Error as e:
-        print("Error inserting dispute: ", e)
-
-'''
 
 # retrieves content, platform of a review from the database
 def load_review(dispute_id=None, review_id=None):
@@ -175,44 +158,13 @@ def analyze_review(review, platform):
         return { "LLM_Response":response_content, "content":review, "platform":platform, "Error":f"Unable to parse the LMM response." }
 
     return json_result
-'''
-def save_flagged_reasons(dispute_id, json_result):
-    try:
-        con = get_postgres_conn()
-        cur = con.cursor()
 
-        flagged_reason = ''
-        for policy_json in json_result:
-            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
-
-        query = f'update public.disputes set flagged_reason = %s where dispute_id=%s'
-        cur.execute(query, (flagged_reason, dispute_id))
-        con.commit()
-    except psycopg2.Error as e:
-        print(f"Error inserting dispute: {e}")
-'''
 
 # Flask Service Connection for endpoints
 
 app = Flask("GPT_Analysis")
 
-
-# Endpoint to analyze review to see if it violates given platform policies
-'''
-@app.route('/dispute-set-flags', methods=['POST'])
-def dispute_set_flags_call():
-    data = request.json
-    dispute_id = data.get("dispute_id")
-
-    content, platform = load_review(dispute_id=dispute_id)
-    json_result = analyze_review(content, platform)
-    if len(json_result) > 0:
-        save_flagged_reasons(dispute_id, json_result)
-    else:
-        save_flagged_reasons(dispute_id, [{'violated_policy_category':"",'policy_violation_reason':"No policy violations found."}])
-    return jsonify(json_result)
-'''
-
+# Endpoint to analyze given review based on the review_id parameter. Returns a json list of "violation_type", "reasoning", "text", "confidence_score" for each policy violation
 @app.route('/analyze-review', methods=['POST'])
 def analyze_review_call():
     data = request.json
@@ -222,6 +174,7 @@ def analyze_review_call():
 
     return jsonify(json_result)
 
+# Endpoint to analyze given review with parameters content and platform. Returns a json list of "violation_type", "reasoning", "text", "confidence_score" for each policy violation
 @app.route('/analyze-review-text', methods=['POST'])
 def analyze_review_text_call():
     data = request.json
@@ -232,11 +185,6 @@ def analyze_review_text_call():
         return jsonify({"Error":"Missing / Empty content or platform parameters.","Content":data})
 
     json_result = analyze_review(content, platform)
-    '''
-    analysis = ''
-    for policy_json in json_result:
-        analysis = f"{analysis} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
-    '''
 
     return jsonify(json_result)
 
@@ -257,3 +205,60 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+# OLD CODE
+
+# Endpoint to analyze review to see if it violates given platform policies (outdated formatting)
+'''
+@app.route('/dispute-set-flags', methods=['POST'])
+def dispute_set_flags_call():
+    data = request.json
+    dispute_id = data.get("dispute_id")
+
+    content, platform = load_review(dispute_id=dispute_id)
+    json_result = analyze_review(content, platform)
+    if len(json_result) > 0:
+        save_flagged_reasons(dispute_id, json_result)
+    else:
+        save_flagged_reasons(dispute_id, [{'violated_policy_category':"",'policy_violation_reason':"No policy violations found."}])
+    return jsonify(json_result)
+'''
+
+# Save flagged reasons in the given dispute (outdated formatting)
+'''
+def save_flagged_reasons(dispute_id, json_result):
+    try:
+        con = get_postgres_conn()
+        cur = con.cursor()
+
+        flagged_reason = ''
+        for policy_json in json_result:
+            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}; "
+
+        query = f'update public.disputes set flagged_reason = %s where dispute_id=%s'
+        cur.execute(query, (flagged_reason, dispute_id))
+        con.commit()
+    except psycopg2.Error as e:
+        print(f"Error inserting dispute: {e}")
+'''
+
+# saves analysis of flagged review in the disputes database (the code saves flags in the review db now)
+'''
+def save_review_analysis(review_id, analysis_json):
+    try:
+        con = get_postgres_conn()
+        cur = con.cursor()
+
+        flagged_reason = ''
+        for policy_json in analysis_json:
+            flagged_reason = f"{flagged_reason} {policy_json['violated_policy_category']}:{policy_json['policy_violation_reason']}, "
+
+        query = f'INSERT INTO public.disputes("review_ID", flagged_reason) VALUES (%s, %s)'
+        cur.execute(query, (review_id, flagged_reason,))
+        con.commit()
+    except psycopg2.Error as e:
+        print("Error inserting dispute: ", e)
+
+'''
