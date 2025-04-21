@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const businessAccessLayer = require('../models/businessesAccessLayer');
 
-// Add authentication middleware when finished
-// const auth = require('');
+const auth = require('../middleware/auth');
 
 // POST /api/business - create the business profile
-router.post('/', /*auth,*/ async (req, res) => {
+router.post('/', auth, async (req, res) => {
     const { businessName, facebookPageId, googlePlaceId, trustpilotBusinessUnitId, yelpBusinessId } = req.body;
     
     if (!businessName) {
@@ -31,7 +30,7 @@ router.post('/', /*auth,*/ async (req, res) => {
 });
 
 // GET /api/business - Get the business profile
-router.get('/', /*auth,*/ async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const business = await businessAccessLayer.getBusinessByUserId(req.user.id); //From auth middleware
         
@@ -47,7 +46,7 @@ router.get('/', /*auth,*/ async (req, res) => {
 });
 
 // PUT /api/business - Update business platform IDs
-router.put('/', /*auth,*/ async (req, res) => {
+router.put('/', auth, async (req, res) => {
     const { facebookPageId, googlePlaceId, trustpilotBusinessUnitId, yelpBusinessId } = req.body;
     
     try {
