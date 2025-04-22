@@ -22,10 +22,16 @@ CREATE TABLE public.reviews (
     "timestamp" date NOT NULL,
     source_id character varying(255) NOT NULL,
     user_id integer,
-    analysis_data jsonb
+    analysis_data jsonb,
+    status smallint DEFAULT 0
 );
 
 ALTER TABLE public.reviews OWNER TO postgres;
+
+COMMENT ON COLUMN public.reviews.status IS '0 = normal
+1 = flagged
+2 = disputed
+3 = removed';
 
 ALTER TABLE public.reviews ALTER COLUMN review_id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Reviews_review_ID_seq"
@@ -36,7 +42,7 @@ ALTER TABLE public.reviews ALTER COLUMN review_id ADD GENERATED ALWAYS AS IDENTI
     CACHE 1
 );
 
-COPY public.reviews (review_id, platform, rating, content, "timestamp", source_id, user_id, analysis_data) FROM stdin;
+COPY public.reviews (review_id, platform, rating, content, "timestamp", source_id, user_id, analysis_data, status) FROM stdin;
 
 SELECT pg_catalog.setval('public."Reviews_review_ID_seq"', 1, false);
 
