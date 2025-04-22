@@ -26,7 +26,8 @@ ALTER TABLE public.disputes OWNER TO postgres;
 
 COMMENT ON COLUMN public.disputes.dispute_status IS '0 = initiated
 1 = escalated
-2 = resolved';
+2 = resolved
+3 = removed';
 
 ALTER TABLE public.disputes ALTER COLUMN dispute_id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Disputes_dispute_ID_seq"
