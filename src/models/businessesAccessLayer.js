@@ -45,7 +45,7 @@ const businessAccessLayer = {
             SET 
                 facebook_page_id = COALESCE($2, facebook_page_id),
                 google_place_id = COALESCE($3, google_place_id),
-                trustpilot_unit_id = COALESCE($4, trustpilot_businessunit_id),
+                trustpilot_businessunit_id = COALESCE($4, trustpilot_businessunit_id),
                 yelp_business_id = COALESCE($5, yelp_business_id)
             WHERE business_id = $1 RETURNING *`,
       [
