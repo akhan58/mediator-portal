@@ -18,14 +18,22 @@ async function syncExternalReviews(userId) {
     }
 
     // Sync reviews from all available platforms
-    await syncPlatformReviews("google", business.google_place_id, userId);
-    await syncPlatformReviews(
-      "trustpilot",
-      business.trustpilot_businessunit_id,
-      userId,
-    );
-    await syncPlatformReviews("yelp", business.yelp_business_id, userId);
-    await syncPlatformReviews("facebook", business.facebook_page_id, userId);
+    if (!business.google_place_id == null) {
+      await syncPlatformReviews("google", business.google_place_id, userId);
+    }
+    if (!business.trustpilot_businessunit_id == null) {
+      await syncPlatformReviews(
+        "trustpilot",
+        business.trustpilot_businessunit_id,
+        userId,
+      );
+    }
+    if (!business.yelp_business_id == null) {
+      await syncPlatformReviews("yelp", business.yelp_business_id, userId);
+    }
+    if (!business.facebook_page_id == null) {
+      await syncPlatformReviews("facebook", business.facebook_page_id, userId);
+    }
 
     return { success: true };
   } catch (err) {

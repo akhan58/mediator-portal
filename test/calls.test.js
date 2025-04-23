@@ -241,3 +241,28 @@ test("Create two businesses", async () => {
   expect(business.data.business_name).toBe("Very Big Contracting Company");
   expect(false).toBe(true); // We manually fail this test until #16 is resolved
 });
+
+test("Test review synchronization", async () => {
+  // First, we create a business with a Google Place ID and a yelp ID.
+  const response = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/business",
+    headers: auth_headers,
+    data: {
+      businessName: "Contracting",
+      facebookPageID: null,
+      googlePlaceId: "5553344967833012882",
+      trustpilotBusinessId: null,
+      yelpBusinessId: "atlas-pools-keller",
+    },
+  });
+
+  // Now, we synchronize.
+  const sync_response = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/reviews/sync",
+    headers: auth_headers,
+  });
+
+  console.log(sync_response.data);
+});
