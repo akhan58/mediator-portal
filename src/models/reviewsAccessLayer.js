@@ -65,6 +65,13 @@ const reviewsAccessLayer = {
         return results.rows;
     },
 
+    async updateReviewStatus({reviewId, status}) {
+        const results = await pool.query(`UPDATE reviews SET status = $2 WHERE "review_id" = $1 RETURNING *`,
+            [reviewId, status]
+        );
+        return results.rows[0];
+    },
+
     // DELETE review
     async deleteReview(reviewId) {
         const results =  await pool.query(`DELETE FROM reviews WHERE "review_id" = $1`,
