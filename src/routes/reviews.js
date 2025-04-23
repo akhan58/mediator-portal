@@ -320,17 +320,7 @@ router.post("/sync", auth, async (req, res) => {
   }
 });
 
-// GET /api/reviews/user — return all reviews for the logged-in user
-router.get('/user', auth, async (req, res) => {
-  try {
-    const userId = req.user_id;
-    const reviews = await reviewsAccessLayer.getReviewByUserId(userId);
-    res.status(200).json(reviews);
-  } catch (err) {
-    console.error("Error fetching reviews by user:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+
 
 
 
