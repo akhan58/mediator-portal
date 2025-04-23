@@ -6,6 +6,7 @@ const disputesAccessLayer = require('../models/disputesAccessLayer');
 
 const { validateInt, validateDisputeStatusBody, validateDisputeStatusParam } = require('../validators/idValidation');
 const { validationResult } = require('express-validator');
+const reviewsAccessLayer = require('../models/reviewsAccessLayer');
 
 // POST /api/disputes/analyze/reviewId -- call the Flask API
 router.post('/analyze/:reviewId', validateInt('reviewId'), async (req, res) => {
@@ -121,6 +122,32 @@ router.put('/:disputeId', validateInt('disputeId'), validateDisputeStatusBody, a
         if (!dispute) {
             return res.status(404).json({error: 'Dispute not found' });
         }
+
+        // Sync review status with dispute status
+        let reviewStatus;
+        switch(parseInt(disputeStatus)) {
+            case 0: // normal
+                reviewStatus = 0; // normal
+                break;
+            case 1: // escalated
+                reviewStatus = 1; //flagged
+                break;
+            case 2: // resolved
+                reviewStatus = 2; // disputed
+                break;
+            case 3: // removed
+                reviewStatus = 3; //removed
+                break;
+            default:
+                reviewStatus = 0; // normal
+        }
+
+        // Update review status
+        await reviewsAccessLayer.updateReviewStatus({
+            reviewId: dispute.review_id,
+            status: reviewStatus
+        });
+
         res.status(200).json(dispute);
     } catch (err) {
         console.error(err);

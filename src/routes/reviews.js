@@ -8,6 +8,8 @@ const { fetchTrustpilotReviews } = require('./trustpilotReviews');
 const { fetchYelpReviews } = require ('./yelpReviews');
 const { fetchFacebookReviews } = require('./facebookReviews');
 
+const { syncExternalReviews } = require('../services/reviewSyncService');
+
 const auth = require('../middleware/auth');
 
 // GET /api/reviews/google -- fetch and store Google reviews
@@ -258,6 +260,21 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
+    }
+});
+
+router.post('/sync', auth, async (req, res) => {
+    try {
+        const result = await syncExternalReviews(req.user.id);
+
+        if (!result) {
+            return res.status(400).json({ error: result.error });
+        }
+
+        res.status(200).json({message: "Reviews sync successful" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Server error" });
     }
 });
 

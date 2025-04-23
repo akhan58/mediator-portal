@@ -24,7 +24,7 @@ CREATE TABLE public.disputes (
 
 ALTER TABLE public.disputes OWNER TO postgres;
 
-COMMENT ON COLUMN public.disputes.dispute_status IS '0 = initiated
+COMMENT ON COLUMN public.disputes.dispute_status IS '0 = normal
 1 = escalated
 2 = resolved
 3 = removed';
