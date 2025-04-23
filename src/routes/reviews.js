@@ -209,7 +209,7 @@ router.get('/facebook', auth, async (req, res) => {
 });
 
 // GET /api/reviews -- return reviews with query filters, pagination, and sorting
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         // Extract review parameters
         const reviewFilters = {

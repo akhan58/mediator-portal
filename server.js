@@ -4,10 +4,10 @@
 // It then mounts the authentication routes (/auth), review-related routes (/api/reviews),
 // and review request generation routes (/api/reviewGeneration). Finally, it listens on the specified port.
 
-const express = require('express');
-const passport = require('passport');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const express = require("express");
+const passport = require("passport");
+const dotenv = require("dotenv");
+const cors = require("cors");
 
 // Load environment variables
 dotenv.config();
@@ -21,15 +21,16 @@ app.use(passport.initialize());
 app.use(express.json()); // To parse JSON data
 
 // Routes
-app.use('/auth', require('./src/routes/auth'));
-app.use('/api/reviews', require('./src/routes/reviews'));
-app.use('/api/reviewGeneration', require('./src/routes/reviewGeneration'));
-app.use('/api/mock-reviews', require('./src/routes/mockReviews'));
-app.use('/api/interactions', require('./src/routes/interactions'));
+app.use("/auth", require("./src/routes/auth"));
+app.use("/api/reviews", require("./src/routes/reviews"));
+app.use("/api/reviewGeneration", require("./src/routes/reviewGeneration"));
+app.use("/api/mock-reviews", require("./src/routes/mockReviews"));
+app.use("/api/interactions", require("./src/routes/interactions"));
+app.use("/api/business", require("./src/routes/business"));
 
 // ✅ New route for review responses (Task #3)
-const reviewResponseRoutes = require('./src/routes/reviewResponse');
-app.use('/api/review-response', reviewResponseRoutes);
+const reviewResponseRoutes = require("./src/routes/reviewResponse");
+app.use("/api/review-response", reviewResponseRoutes);
 
 // You can enable dispute routes once the file is finalized
 // const disputeRoutes = require('./src/routes/disputes');
