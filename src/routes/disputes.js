@@ -16,20 +16,13 @@ router.post('/analyze/:reviewId', validateInt('reviewId'), async (req, res) => {
     if (!result.isEmpty()){
         return res.status(400).json({errors: result.array() });
     }
-    // TODO: remove AI integration from the disputes.js
     try {
         const reviewId = req.params.reviewId;
-
-        // Calling Flask API
-        const response = await axios.post('http://localhost:3500/analyze-review', {
-            review_id: reviewId
-        });
 
         // Create dispute with analysis data
         const dispute = await disputesAccessLayer.createDispute({
             reviewId,
-            flaggedReason: " ",
-            analysisData: response.data
+            flaggedReason: " "
         });
 
         res.status(200).json(dispute);

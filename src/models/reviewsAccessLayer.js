@@ -5,23 +5,30 @@ const axios = require('axios');
 const reviewsAccessLayer = {
 
     // CREATE
-    // TODO: add analysis_data column to the reviews table
     async createReview({platform, rating, content, timestamp, sourceId, userId}) {
 
         try {
-    
-            // Calling Flask API
-            const response = await axios.post('http://localhost:3500/analyze-review-text', {
-                content: content,
-                platform: platform
-            });
+            let response_data = ""
+            if(rating>3)
+            {
+                response_data = "{}"
+            }
+            else
+            {
+                // Calling Flask API
+                const response = await axios.post('http://localhost:3500/analyze-review-text', {
+                    content: content,
+                    platform: platform
+                });
+                response_data = response.data
+            }
     
         } catch (err) {
             console.error(err);
         }
 
-        const results = await pool.query(`INSERT INTO reviews (platform, rating, content, timestamp, source_id, user_id, analysis_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
-            [platform, rating, content, timestamp, sourceId, userId, response.data]);
+        const results = await pool.query(`INSERT INTO reviews (platform, rating, content, timestamp, source_id, user_id, analysis_data) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
+            [platform, rating, content, timestamp, sourceId, userId, response_data]);
         return results.rows[0];
     },
 
