@@ -4,7 +4,9 @@ const pool = require("../config/db");
 const disputesAccessLayer = {
 
     // CREATE
-    async createDispute ({reviewId, flaggedReason, analysisData}) {
+    async createDispute ({reviewId, flaggedReason}) {
+        const analysisData =  await pool.query(`SELECT analysis_data FROM reviews WHERE "review_id" = $1`,
+            [reviewId]);
         const results = await pool.query(`INSERT INTO disputes (review_id, flagged_reason, dispute_status, analysis_data) VALUES ($1, $2, 0, $3) RETURNING *`, 
             [reviewId, flaggedReason, analysisData]);
         return results.rows[0];
