@@ -249,55 +249,13 @@ router.get("/facebook", auth, async (req, res) => {
 // GET /api/reviews -- return reviews with query filters, pagination, and sorting
 router.get("/", auth, async (req, res) => {
   try {
-    // Extract review parameters
-    const reviewFilters = {
-      platform: req.query.platform,
-      rating: req.query.rating ? parseInt(req.query.rating) : null,
-      userId: req.query.userId ? parseInt(req.query.userId) : null,
-    };
-
-    // Extract pagination parameters
-    const pagination = {
-      page: req.query.page ? parseInt(req.query.page) : 1,
-      limit: req.query.limit ? parseInt(req.query.limit) : 10,
-      offset:
-        (req.query.page ? parseInt(req.query.page) - 1 : 0) *
-        (req.query.limit ? parseInt(req.query.limit) : 10),
-    };
-
-    // Extract sorting parameters
-    const sorting = {
-      sortBy: req.query.sortBy || "timestamp", // Default sort by timestamp
-      sortOrder: req.query.sortOrder === "asc" ? "ASC" : "DESC", // Default sort order is DESC
-    };
-
-    // Dispute and flagged filters
-    const disputeFilters = {
-      flaggedReason: req.query.flaggedReason === "true",
-      disputeStatus: req.query.disputeStatus
-        ? parseInt(req.query.disputeStatus)
-        : null,
-    };
-
     // Get reviews with filters, pagination and sorting
-    const { reviews, totalCount } = await reviewsAccessLayer.getFilteredReviews(
-      reviewFilters,
-      pagination,
-      sorting,
-      disputeFilters,
-    );
-
-    // Calculate total pages
-    const totalPages = Math.ceil(totalCount / pagination.limit);
+    // TODO - replace this function with getFilteredReviews when the function works
+    // To view code to build that function, see commit history
+    const reviews = await reviewsAccessLayer.getReviewByUserId(req.user_id);
 
     res.status(200).json({
       reviews,
-      pagination: {
-        total: totalCount,
-        page: pagination.page,
-        limit: pagination.limit,
-        totalPages,
-      },
     });
   } catch (err) {
     console.error(err);

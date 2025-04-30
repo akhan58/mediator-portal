@@ -42,7 +42,6 @@ ALTER TABLE public.reviews ALTER COLUMN review_id ADD GENERATED ALWAYS AS IDENTI
     CACHE 1
 );
 
-COPY public.reviews (review_id, platform, rating, content, "timestamp", source_id, user_id, analysis_data, status) FROM stdin;
 
 SELECT pg_catalog.setval('public."Reviews_review_ID_seq"', 1, false);
 

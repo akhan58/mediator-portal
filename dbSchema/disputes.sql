@@ -38,7 +38,6 @@ ALTER TABLE public.disputes ALTER COLUMN dispute_id ADD GENERATED ALWAYS AS IDEN
     CACHE 1
 );
 
-COPY public.disputes (dispute_id, review_id, flagged_reason, dispute_status, analysis_data) FROM stdin;
 SELECT pg_catalog.setval('public."Disputes_dispute_ID_seq"', 1, false);
 
 ALTER TABLE ONLY public.disputes

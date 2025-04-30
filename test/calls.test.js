@@ -31,7 +31,7 @@ const auth_token = jwt.sign(
   {
     expiresIn: "1h",
   },
-); // DELETE THIS WHEN WE HAVE LOGIN THAT WORKS
+);
 const auth_headers = {
   Authorization: `Bearer ${auth_token}`,
   "Content-Type": "application/json",
@@ -61,8 +61,7 @@ test("Retrieve user reviews", async () => {
       platform: "Google",
     },
   });
-  console.log(response.data);
-  // TODO - write the rest of the tests when the 500 error is fixed
+  // Honestly, as long as we get a 200 response, I don't care what the returned data is
 });
 
 // Test responding to reviews
@@ -75,12 +74,10 @@ test("Responding to reviews", async () => {
       platform: "Google",
     },
   });
-  // TODO - change logic ahead to use new review retrieval endpoint
-  // Then, pick a review to respond to.
-  // We pick review 4 because it has 2 stars.
-  const review = response.data[3];
 
-  // The user writes their reply.
+  // Then, pick a review to respond to, and write a reply.
+  // We pick review 4 because it has 2 stars.
+  const review = response.data.reviews[3];
   const reply = "Your review sucks, and you smell.";
 
   // The user hits the 'reply' button, which will then respond to the review.
@@ -93,12 +90,17 @@ test("Responding to reviews", async () => {
       responseText: reply,
     },
   });
-  console.log(respond);
-  expect(true).toBe(true);
 
-  // TODO - finish completing test when above code works.
+  // Now, let's get the interactions to see if it worked.
+  const interactions = await axios({
+    method: "get",
+    url: BACKEND_URI + "/api/interactions",
+    headers: auth_headers,
+  });
+  expect(interactions.data.interactions[0].review_id).toBe(review.review_id);
 });
 
+// This test also tests to see if we can create disputes
 test("Receive AI feedback", async () => {
   // First, get our reviews.
   const response = await axios({
@@ -118,7 +120,7 @@ test("Receive AI feedback", async () => {
   // TODO - use the node endpoint for this instead of the python endpoint.
   const get_ai_feedback = await axios({
     method: "post",
-    url: AI_BACKEND_URI + "/analyze-review-text",
+    url: BACKEND_URI + `/api/disputes/analyze/${review.review_id}`,
     headers: auth_headers,
     data: {
       platform: review.platform,
@@ -138,7 +140,7 @@ test("Dispute user reviews", async () => {
   // First, get our reviews.
   const response = await axios({
     method: "get",
-    url: BACKEND_URI + "/api/reviews",
+    url: BACKEND_URI + "/api/reviews/",
     headers: auth_headers,
     params: {
       platform: "Google",

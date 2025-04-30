@@ -1,107 +1,111 @@
 const pool = require("../config/db");
-const axios = require('axios');
 
 // CRUD functions
 const reviewsAccessLayer = {
+  // CREATE
+  async createReview({
+    platform,
+    rating,
+    content,
+    timestamp,
+    sourceId,
+    userId,
+  }) {
+    const results = await pool.query(
+      `INSERT INTO reviews (platform, rating, content, timestamp, source_id, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [platform, rating, content, timestamp, sourceId, userId],
+    );
+    return results.rows[0];
+  },
 
-    // CREATE
-    async createReview({platform, rating, content, timestamp, sourceId, userId}) {
+  // READ all
+  async getAllReview() {
+    const results = await pool.query(`SELECT * FROM reviews`);
+    return results.rows;
+  },
 
-        try {
-            let response_data = ""
-            if(rating>3)
-            {
-                response_data = "{}"
-            }
-            else
-            {
-                // Calling Flask API
-                const response = await axios.post('http://localhost:3500/analyze-review-text', {
-                    content: content,
-                    platform: platform
-                });
-                response_data = response.data
-            }
-    
-        } catch (err) {
-            console.error(err);
-        }
+  // READ: get reviews by review_id
+  async getReviewById(reviewId) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "review_id" = $1`,
+      [reviewId],
+    );
+    return results.rows;
+  },
 
-        const results = await pool.query(`INSERT INTO reviews (platform, rating, content, timestamp, source_id, user_id, analysis_data) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
-            [platform, rating, content, timestamp, sourceId, userId, response_data]);
-        return results.rows[0];
-    },
+  // READ: get reviews by user_id
+  async getReviewByUserId(userId) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "user_id" = $1`,
+      [userId],
+    );
+    return results.rows;
+  },
 
-    // READ all
-    async getAllReview() {
-        const results = await pool.query(`SELECT * FROM reviews`);
-        return results.rows;
-    },
+  // READ: get reviews by source_id
+  async getReviewsByPlatformAndSourceId(platform, sourceId) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "platform" = $1 AND "source_id" = $2`,
+      [platform, sourceId],
+    );
+    return results.rows;
+  },
 
-    // READ: get reviews by review_id
-    async getReviewById(reviewId) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "review_id" = $1`,
-            [reviewId]);
-        return results.rows;
-    },
+  // READ: get reviews by platform
+  async getReviewByPlatform(platform) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "platform" = $1`,
+      [platform],
+    );
+    return results.rows;
+  },
 
-    // READ: get reviews by user_id
-    async getReviewByUserId(userId) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "user_id" = $1`,
-            [userId]);
-        return results.rows;
-    },
+  // READ: get reviews by rating
+  async getReviewByRating(rating) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "rating" = $1`,
+      [rating],
+    );
+    return results.rows;
+  },
 
-     // READ: get reviews by source_id
-     async getReviewsByPlatformAndSourceId(platform, sourceId) {
-        const results = await pool.query(`SELECT * FROM reviews WHERE "platform" = $1 AND "source_id" = $2`,
-            [platform, sourceId]);
-            return results.rows;
-    },
+  // READ: get reviews by platform & rating
+  async getReviewByPlatformAndRating(platform, rating) {
+    const results = await pool.query(
+      `SELECT * FROM reviews WHERE "platform" = $1 AND "rating" = $2`,
+      [platform, rating],
+    );
+    return results.rows;
+  },
 
-    // READ: get reviews by platform
-    async getReviewByPlatform(platform) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "platform" = $1`,
-            [platform]);
-        return results.rows;
-    },
+  // UPDATE review
+  async updateReview({ reviewId, rating, content }) {
+    const results = await pool.query(
+      `UPDATE reviews SET rating=$2, content=$3 WHERE "review_id"=$1 RETURNING *`,
+      [reviewId, rating, content],
+    );
+    return results.rows;
+  },
 
-    // READ: get reviews by rating
-    async getReviewByRating(rating) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "rating" = $1`,
-            [rating]);
-        return results.rows;
-    },
+  async updateReviewStatus({ reviewId, status }) {
+    const results = await pool.query(
+      `UPDATE reviews SET status = $2 WHERE "review_id" = $1 RETURNING *`,
+      [reviewId, status],
+    );
+    return results.rows[0];
+  },
 
-    // READ: get reviews by platform & rating
-    async getReviewByPlatformAndRating(platform, rating) {
-        const results =  await pool.query(`SELECT * FROM reviews WHERE "platform" = $1 AND "rating" = $2`,
-            [platform, rating]);
-        return results.rows;
-    },
+  // DELETE review
+  async deleteReview(reviewId) {
+    const results = await pool.query(
+      `DELETE FROM reviews WHERE "review_id" = $1`,
+      [reviewId],
+    );
+    return results.rows;
+  },
 
-    // UPDATE review
-    async updateReview({reviewId, rating, content}) {
-        const results = await pool.query(`UPDATE reviews SET rating=$2, content=$3 WHERE "review_id"=$1 RETURNING *`, 
-            [reviewId, rating, content]);
-        return results.rows;
-    },
-
-    async updateReviewStatus({reviewId, status}) {
-        const results = await pool.query(`UPDATE reviews SET status = $2 WHERE "review_id" = $1 RETURNING *`,
-            [reviewId, status]
-        );
-        return results.rows[0];
-    },
-
-    // DELETE review
-    async deleteReview(reviewId) {
-        const results =  await pool.query(`DELETE FROM reviews WHERE "review_id" = $1`,
-            [reviewId]);
-        return results.rows;
-    },
-
-    // Build queries with filters
+  // Build queries with filters
+  /*
     async buildFilteredReviewsQuery(reviewFilters, disputeFilters) {
         const disputeFiltersJoin = disputeFilters.flaggedReason || disputeFilters.disputeStatus !== null;
 
@@ -212,6 +216,7 @@ const reviewsAccessLayer = {
             totalCount
         };
     }
-}
+    */
+};
 
 module.exports = reviewsAccessLayer;
