@@ -3,4 +3,3 @@ chroma_db
 src/python/chroma_db
 src/python/venv
 .env
-dbSchema/*
