@@ -23,6 +23,7 @@ app.use(express.json()); // To parse JSON data
 // Routes
 app.use("/auth", require("./src/routes/auth"));
 app.use("/api/reviews", require("./src/routes/reviews"));
+app.use("/api/disputes", require("./src/routes/disputes")); // I can't believe I had to add this.
 app.use("/api/reviewGeneration", require("./src/routes/reviewGeneration"));
 app.use("/api/mock-reviews", require("./src/routes/mockReviews"));
 app.use("/api/interactions", require("./src/routes/interactions"));

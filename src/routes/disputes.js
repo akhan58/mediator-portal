@@ -6,6 +6,7 @@ const disputesAccessLayer = require("../models/disputesAccessLayer");
 
 const {
   validateInt,
+  validateIntBody,
   validateDisputeStatusBody,
   validateDisputeStatusParam,
 } = require("../validators/idValidation");
@@ -14,20 +15,23 @@ const reviewsAccessLayer = require("../models/reviewsAccessLayer");
 
 const auth = require("../middleware/auth");
 
-// POST /api/disputes/analyze/reviewId -- call the Flask API
-router.post("/analyze/:reviewId", validateInt("reviewId"), async (req, res) => {
+// POST /api/disputes/create -- create a dispute
+// Generally, with post requests, we want to use the body of the request to pass in data.
+router.post("/create", auth, validateIntBody("reviewId"), async (req, res) => {
   // Extract validation error into a result object
   const result = validationResult(req);
   if (!result.isEmpty()) {
+    console.log('Failed to validate request');
+    console.log(result);
     return res.status(400).json({ errors: result.array() });
   }
   try {
-    const reviewId = req.params.reviewId;
+    const reviewId = req.body.reviewId;
 
     // Create dispute with analysis data
     const dispute = await disputesAccessLayer.createDispute({
       reviewId,
-      flaggedReason: " ",
+      flaggedReason: req.body.flaggedReason,
     });
 
     res.status(200).json(dispute);
@@ -40,6 +44,7 @@ router.post("/analyze/:reviewId", validateInt("reviewId"), async (req, res) => {
 // GET /api/disputes/disputeId/disputeId -- get dipsutes by dispute_id
 router.get(
   "/disputeId/:disputeId",
+  auth,
   validateInt("disputeId"),
   async (req, res) => {
     // Extract validation error into a result object

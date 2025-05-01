@@ -37,6 +37,7 @@ const auth_headers = {
   "Content-Type": "application/json",
 };
 
+
 // Test our authentication middleware to reject requests without a token.
 // We will do more tests eventually, but for an MVP this is enough.
 test("Bad auth headers", async () => {
@@ -48,6 +49,7 @@ test("Bad auth headers", async () => {
     expect(error.response.status).toBe(403);
   }
 });
+
 
 // we STILL don't have an endpoint to get reviews by user_id,
 // so we get all reviews in this test.
@@ -63,6 +65,7 @@ test("Retrieve user reviews", async () => {
   });
   // Honestly, as long as we get a 200 response, I don't care what the returned data is
 });
+
 
 // Test responding to reviews
 test("Responding to reviews", async () => {
@@ -100,7 +103,9 @@ test("Responding to reviews", async () => {
   expect(interactions.data.interactions[0].review_id).toBe(review.review_id);
 });
 
-// This test also tests to see if we can create disputes
+
+// For now, this test also checks to see if we can make disputes.
+// This functionality needs to be implemented as a seperate endpoint.
 test("Receive AI feedback", async () => {
   // First, get our reviews.
   const response = await axios({
@@ -113,14 +118,16 @@ test("Receive AI feedback", async () => {
   });
   // Then, pick a review to respond to.
   // We pick review 3 because it says we are evil and we should go to jail.
-  const review = response.data[2];
+  const review = response.data.reviews[2];
+  console.log(review.review_id)
 
   // Our system should automatically call this API key (I think...)
   // However, since we don't have connections, we do it manually here.
+  let url = AI_BACKEND_URI + '/analyze-review-text';
   // TODO - use the node endpoint for this instead of the python endpoint.
   const get_ai_feedback = await axios({
     method: "post",
-    url: BACKEND_URI + `/api/disputes/analyze/${review.review_id}`,
+    url: url,
     headers: auth_headers,
     data: {
       platform: review.platform,
@@ -128,12 +135,36 @@ test("Receive AI feedback", async () => {
     },
   });
 
+  // The AI recommends the highest weighted violation type.
   console.log("Got feedback: ");
   console.log(get_ai_feedback.data);
+  const violation_type = get_ai_feedback.data[0].violation_type;
 
-  // In this story, the user just uses the AI's feedback.
-  const violation_type = get_ai_feedback.data.violation_type;
+  // In this story, the user accepts the AI's feedback and simply submits the dispute.
+  const create_dispute = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/disputes/create",
+    headers: auth_headers,
+    data: {
+      reviewId: review.review_id,
+      flaggedReason: violation_type,
+    },
+  })
+
+  // Now, the user wants to see if they can see the dispute they just created.
+  const dispute = await axios({
+    method: "get",
+    url: BACKEND_URI + `/api/disputes/disputeId/` + create_dispute.data.dispute_id,
+    headers: auth_headers,
+    body: {
+      flaggedReason: violation_type,
+    }
+
+  })
+  expect(dispute.data.flagged_reason).toBe(violation_type);
+
 }, 20000); // 20 second timeout. We need to determine how long is too long for these operations.
+
 
 // This review is the same for 'receive AI feedback', but it also involves creating and submitting a dispute.
 test("Dispute user reviews", async () => {
@@ -168,10 +199,13 @@ test("Dispute user reviews", async () => {
   // In this story, the user just uses the AI's feedback.
   const violation_type = get_ai_feedback.data.violation_type;
 
+  // Now, let's create the dispute
+
   // TODO - replace this with the actual endpoint.
   // This test is going to fail until we have an endpoint to create a dispute.
   expect(true).toBe(false);
 }, 20000); // 20 second timeout. We need to determine how long is too long for these operations.
+
 
 // Test for creating a business
 // This should be part of user creation.
@@ -202,6 +236,7 @@ test("Create a business", async () => {
 
   expect(business.data.business_name).toBe("Contracting");
 });
+
 
 // This test checks for an edge case in which a business has more than one word
 test("Create two businesses", async () => {
@@ -243,6 +278,7 @@ test("Create two businesses", async () => {
   expect(business.data.business_name).toBe("Very Big Contracting Company");
   expect(false).toBe(true); // We manually fail this test until #16 is resolved
 });
+
 
 test("Test review synchronization", async () => {
   // First, we create a business with a Google Place ID and a yelp ID.
