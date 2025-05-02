@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 //TODO -- adjust authController to use these functions
 const users = {
-    async getUsers ({username}) {
+    async getUsers (username) {
         const results = await pool.query(`SELECT * FROM users where "username" = $1`,
             [username]
         );
