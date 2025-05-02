@@ -111,10 +111,10 @@ const reviewsAccessLayer = {
         `;
 
         if (disputeFiltersJoin) {
-            query += `LEFT JOIN disputes d ON r.review_id = d.review_id`;
+            query += ` LEFT JOIN disputes d ON r.review_id = d.review_id`;
         }
 
-        query = ` WHERE 1=1`;
+        query += ` WHERE 1=1`;
         
         const queryParams = [];
         let paramCounter = 1;
