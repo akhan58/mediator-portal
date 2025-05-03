@@ -156,54 +156,9 @@ test("Receive AI feedback", async () => {
     method: "get",
     url: BACKEND_URI + `/api/disputes/disputeId/` + create_dispute.data.dispute_id,
     headers: auth_headers,
-    body: {
-      flaggedReason: violation_type,
-    }
-
   })
   expect(dispute.data.flagged_reason).toBe(violation_type);
 
-}, 20000); // 20 second timeout. We need to determine how long is too long for these operations.
-
-
-// This review is the same for 'receive AI feedback', but it also involves creating and submitting a dispute.
-test("Dispute user reviews", async () => {
-  // First, get our reviews.
-  const response = await axios({
-    method: "get",
-    url: BACKEND_URI + "/api/reviews/",
-    headers: auth_headers,
-    params: {
-      platform: "Google",
-    },
-  });
-  // TODO - rewrite this test when we fix the 500 error for getting api reviews
-  const review = response.data[2];
-
-  // Our system should automatically call this API key (I think...)
-  // However, since we don't have connections, we do it manually here.
-  // TODO - use the node endpoint for this instead of the python endpoint.
-  const get_ai_feedback = await axios({
-    method: "post",
-    url: AI_BACKEND_URI + "/analyze-review-text",
-    headers: auth_headers,
-    data: {
-      platform: review.platform,
-      content: review.content,
-    },
-  });
-
-  console.log("Got feedback: ");
-  console.log(get_ai_feedback.data);
-
-  // In this story, the user just uses the AI's feedback.
-  const violation_type = get_ai_feedback.data.violation_type;
-
-  // Now, let's create the dispute
-
-  // TODO - replace this with the actual endpoint.
-  // This test is going to fail until we have an endpoint to create a dispute.
-  expect(true).toBe(false);
 }, 20000); // 20 second timeout. We need to determine how long is too long for these operations.
 
 
@@ -304,3 +259,103 @@ test("Test review synchronization", async () => {
 
   console.log(sync_response.data);
 });
+
+
+test("Test deleting disputes", async () => {
+  // First, get our reviews.
+  const response = await axios({
+    method: "get",
+    url: BACKEND_URI + "/api/reviews",
+    headers: auth_headers,
+    params: {
+      platform: "Google",
+    },
+  });
+  // Then, pick a review to respond to.
+  // We pick review 3 because it says we are evil and we should go to jail.
+  const review = response.data.reviews[2];
+  console.log(review.review_id)
+
+  // Create a review
+  const create_dispute = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/disputes/create",
+    headers: auth_headers,
+    data: {
+      reviewId: review.review_id,
+      flaggedReason: 'because i wanna :)',
+    },
+  })
+
+  // Let's just make sure we can get the dispute.
+  const dispute = await axios({
+    method: "get",
+    url: BACKEND_URI + `/api/disputes/disputeId/` + create_dispute.data.dispute_id,
+    headers: auth_headers,
+  })
+
+  // Now, let's say the dispute is resolved, and the user wants to delete it to clean their feed.
+  const delete_dispute = await axios({
+    method: "delete",
+    url: BACKEND_URI + '/api/disputes/' + create_dispute.data.dispute_id,
+    headers: auth_headers
+  })
+
+  // Now, if we try to get the dispute again, it should return 404.
+  try {
+    const deleted_dispute = await axios({
+      method: "get",
+      url: BACKEND_URI + `/api/disputes/disputeId/` + create_dispute.data.dispute_id,
+      headers: auth_headers,
+    })
+  } catch (error) {
+    expect(error.status).toBe(404);
+  }
+})
+
+
+test("Test Google connections", async () => {
+  // First, we create a business with a Google Place ID.
+  const response = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/business",
+    headers: auth_headers,
+    data: {
+      businessName: "Contracting",
+      facebookPageID: null,
+      googlePlaceId: "5553344967833012882",
+      trustpilotBusinessId: null,
+      yelpBusinessId: null,
+    },
+  });
+
+  // Now, let's try to see if we can connect to Google.
+  const google_connection = await axios({
+    method: "get",
+    url: BACKEND_URI + "/api/reviews/google",
+    headers: auth_headers,
+  })
+})
+
+test("Test Yelp connections", async () => {
+  // First, we create a business with a Google Place ID.
+  const response = await axios({
+    method: "post",
+    url: BACKEND_URI + "/api/business",
+    headers: auth_headers,
+    data: {
+      businessName: "Contracting",
+      facebookPageID: null,
+      googlePlaceId: null,
+      trustpilotBusinessId: null,
+      yelpBusinessId: "atlas-pools-keller",
+    },
+  });
+
+  // Now, let's try to see if we can connect to Yelp.
+  const yelp_connection = await axios({
+    method: "get",
+    url: BACKEND_URI + "/api/reviews/yelp",
+    headers: auth_headers,
+  })
+})
